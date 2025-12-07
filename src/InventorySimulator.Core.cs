@@ -135,7 +135,7 @@ public partial class InventorySimulator
     {
         try
         {
-            var weapon = player.PlayerPawn.Value?.WeaponServices?.ActiveWeapon.Value;
+            var weapon = player.PlayerPawn?.WeaponServices?.ActiveWeapon.Value;
             if (
                 weapon == null
                 || !IsCustomWeaponItemID(weapon)
@@ -346,24 +346,22 @@ public partial class InventorySimulator
         var movementServices = pawn.MovementServices?.As<CCSPlayer_MovementServices>();
         if (movementServices == null)
             return;
-        var trace = stackalloc GameTrace[1];
+        var trace = stackalloc CGameTrace[1];
         if (!pawn.IsAbleToApplySpray((IntPtr)trace) || (IntPtr)trace == IntPtr.Zero)
             return;
         SprayCanShakeSound.Recipients.AddRecipient(player.PlayerID);
         SprayCanShakeSound.Emit();
         SprayCanShakeSound.Recipients.RemoveRecipient(player.PlayerID);
-        PlayerSprayCooldownManager[player.SteamID] = Now();
-        var endPos = Vector3toVector(trace->EndPos);
-        var normalPos = Vector3toVector(trace->Normal);
+        PlayerSprayCooldownManager[player.SteamID] = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         var sprayDecal = Core.EntitySystem.CreateEntityByDesignerName<CPlayerSprayDecal>(
             "player_spray_decal"
         );
         if (sprayDecal != null)
         {
-            sprayDecal.EndPos.Add(endPos);
-            sprayDecal.Start.Add(endPos);
-            sprayDecal.Left.Add(movementServices.Left);
-            sprayDecal.Normal.Add(normalPos);
+            sprayDecal.EndPos += trace->EndPos;
+            sprayDecal.Start += trace->EndPos;
+            sprayDecal.Left += movementServices.Left;
+            sprayDecal.Normal += trace->HitNormal;
             sprayDecal.AccountID = (uint)player.SteamID;
             sprayDecal.Player = item.Def;
             sprayDecal.TintID = item.Tint;
@@ -384,7 +382,7 @@ public partial class InventorySimulator
             if (IsPlayerUseCmdBusy(player))
                 PlayerUseCmdBlockManager[player.SteamID] = true;
             if (PlayerUseCmdManager.TryGetValue(player.SteamID, out var timer))
-                timer.Kill();
+                timer.Cancel();
             PlayerUseCmdManager[player.SteamID] = Core.Scheduler.DelayBySeconds(
                 0.1f,
                 () =>
@@ -430,7 +428,6 @@ public partial class InventorySimulator
             ApplyGloveAttributesFromItem(teamPreview.GlovesItem, gloveItem);
             teamPreview.GlovesItemUpdated();
         }
-
         var weaponItem = teamPreview.WeaponItem.IsMelee()
             ? inventory.GetKnife(player.Controller.TeamNum, fallback)
             : inventory.GetWeapon(
@@ -443,7 +440,6 @@ public partial class InventorySimulator
             ApplyWeaponAttributesFromItem(teamPreview.WeaponItem, weaponItem);
             teamPreview.WeaponItemUpdated();
         }
-
         if (
             inventory.Agents.TryGetValue(player.Controller.TeamNum, out var agentItem)
             && agentItem.Def != null

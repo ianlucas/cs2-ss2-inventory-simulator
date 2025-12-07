@@ -20,7 +20,7 @@ public partial class InventorySimulator
         (IPlayer?, PlayerInventory)
     > PlayerOnTickInventoryManager = [];
     public readonly ConcurrentDictionary<ulong, PlayerInventory> PlayerInventoryManager = [];
-    public readonly ConcurrentDictionary<ulong, Timer> PlayerUseCmdManager = [];
+    public readonly ConcurrentDictionary<ulong, CancellationTokenSource> PlayerUseCmdManager = [];
     public readonly ConcurrentDictionary<ulong, bool> PlayerUseCmdBlockManager = [];
     public readonly ConcurrentDictionary<IntPtr, short> ServerSideClientUserid = [];
 
