@@ -347,7 +347,7 @@ public partial class InventorySimulator
         if (movementServices == null)
             return;
         var trace = stackalloc CGameTrace[1];
-        if (!pawn.IsAbleToApplySpray((IntPtr)trace) || (IntPtr)trace == IntPtr.Zero)
+        if (!pawn.IsAbleToApplySpray((nint)trace) || (IntPtr)trace == IntPtr.Zero)
             return;
         SprayCanShakeSound.Recipients.AddRecipient(player.PlayerID);
         SprayCanShakeSound.Emit();

@@ -24,6 +24,8 @@ public partial class InventorySimulator(ISwiftlyCore core) : BasePlugin(core)
 
     public override void Load(bool hotReload)
     {
+        GameFunctions.Initialize(Core);
+
         Core.Event.OnTick += OnTick;
         Core.Event.OnEntityCreated += OnEntityCreated;
         Core.Event.OnConVarValueChanged += OnConVarValueChanged;
