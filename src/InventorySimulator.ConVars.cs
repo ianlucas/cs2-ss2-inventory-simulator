@@ -80,9 +80,9 @@ public partial class InventorySimulator
         ""
     );
     public readonly IConVar<string> Url = core.ConVar.Create(
-        "invsim_hostname",
+        "invsim_url",
         "API URL for the Inventory Simulator service.",
-        "inventory.cstrike.app"
+        "https://inventory.cstrike.app"
     );
     public readonly IConVar<bool> IsWsLogin = core.ConVar.Create(
         "invsim_wslogin",
