@@ -169,7 +169,7 @@ public partial class InventorySimulator
         AuthenticatingPlayer.TryRemove(userId, out var _);
         Core.Scheduler.NextTick(() =>
         {
-            var player = Utilities.GetPlayerFromSteamID(Core, userId);
+            var player = Core.PlayerManager.GetPlayerFromSteamID(userId);
             if (response == null)
             {
                 player?.SendChat(Core.Localizer["invsim.login_failed"]);

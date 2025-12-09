@@ -5,16 +5,18 @@
 
 using System.Reflection;
 using System.Text.RegularExpressions;
-using SwiftlyS2.Shared;
 using SwiftlyS2.Shared.Players;
+
+public static class PlayerManagerExtensions
+{
+    public static IPlayer? GetPlayerFromSteamID(this IPlayerManagerService manager, ulong steamID)
+    {
+        return manager.GetAllPlayers().FirstOrDefault(p => p.SteamID == steamID);
+    }
+}
 
 public static partial class Utilities
 {
-    public static IPlayer? GetPlayerFromSteamID(ISwiftlyCore core, ulong steamId)
-    {
-        return core.PlayerManager.GetAllPlayers().FirstOrDefault(p => p.SteamID == steamId);
-    }
-
     public static string FormatUrl(string format, string urlString)
     {
         if (!Uri.TryCreate(urlString, UriKind.Absolute, out var uri))

@@ -176,7 +176,7 @@ public partial class InventorySimulator
         var pawn = itemServices.Pawn;
         return
             pawn != null && pawn.IsValid && pawn.Controller.IsValid && pawn.Controller.Value != null
-            ? Utilities.GetPlayerFromSteamID(Core, pawn.Controller.Value.SteamID)
+            ? Core.PlayerManager.GetPlayerFromSteamID(pawn.Controller.Value.SteamID)
             : null;
     }
 
