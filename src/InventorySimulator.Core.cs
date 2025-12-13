@@ -408,7 +408,7 @@ public partial class InventorySimulator
             if (teamPreview.Xuid == 0 || (player != null && player.SteamID != teamPreview.Xuid))
                 continue;
             player ??= Core.PlayerManager.GetPlayerFromSteamID(teamPreview.Xuid);
-            if (player == null || player.IsValid)
+            if (player == null || !player.IsValid)
                 continue;
             var inventory = GetPlayerInventory(player);
             GivePlayerTeamPreview(player, teamPreview, inventory);

@@ -52,12 +52,13 @@ public partial class InventorySimulator
     {
         return (thisPtr, a2) =>
         {
+            var ret = next()(thisPtr, a2);
             var controller = Core.Memory.ToSchemaClass<CCSPlayerController>(thisPtr);
             // TODO Pass controller directly to GiveTeamPreviewItems.
             var player = Core.PlayerManager.GetPlayerFromSteamID(controller.SteamID);
             if (player != null)
                 GiveTeamPreviewItems("team_select", player);
-            return next()(thisPtr, a2);
+            return ret;
         };
     }
 
