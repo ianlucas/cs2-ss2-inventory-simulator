@@ -40,7 +40,7 @@ public partial class InventorySimulator
         var pin = inventory.Pin;
         if (pin == null)
             return;
-        for (var index = 0; index < player.Controller.InventoryServices.Rank.ElementSize; index++)
+        for (var index = 0; index < player.Controller.InventoryServices.Rank.ElementCount; index++)
         {
             player.Controller.InventoryServices.Rank[index] =
                 index == 5 ? (MedalRank_t)pin.Value : MedalRank_t.MEDAL_RANK_NONE;
