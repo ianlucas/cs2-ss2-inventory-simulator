@@ -141,34 +141,22 @@ public partial class InventorySimulator
         List<uint>? patches = null
     )
     {
-        try
+        Core.Scheduler.NextTick(() =>
         {
-            Core.Scheduler.NextTick(() =>
-            {
-                if (!player.IsValid)
-                    return;
-                var pawn = player.PlayerPawn;
-                if (pawn == null)
-                    return;
-                if (patches != null && patches.Count == 5)
-                    for (var index = 0; index < patches.Count; index++)
-                        pawn.PlayerPatchEconIndices[index] = patches[index];
-                if (!voFallback)
-                    Core.Scheduler.NextTick(() =>
-                    {
-                        if (pawn.IsValid)
-                        {
-                            pawn.StrVOPrefix = voPrefix;
-                            pawn.HasFemaleVoice = voFemale;
-                        }
-                    });
-                pawn.SetModel(model);
-            });
-        }
-        catch
-        {
-            // Ignore any error.
-        }
+            if (!player.IsValid)
+                return;
+            var pawn = player.PlayerPawn;
+            if (pawn == null || !pawn.IsValid)
+                return;
+            if (patches != null && patches.Count == 5)
+                for (
+                    var index = 0;
+                    index < patches.Count && index < pawn.PlayerPatchEconIndices.ElementCount;
+                    index++
+                )
+                    pawn.PlayerPatchEconIndices[index] = patches[index];
+            pawn.SetModel(model);
+        });
     }
 
     public IPlayer? GetPlayerFromItemServices(CCSPlayer_ItemServices itemServices)
