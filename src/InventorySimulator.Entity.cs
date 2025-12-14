@@ -106,7 +106,6 @@ public partial class InventorySimulator
     {
         UpdateEconItemID(item);
         item.AccountID = new CSteamID(steamId).GetAccountID().m_AccountID;
-
         if (wrapper.WeaponItem != null)
         {
             wrapper.WeaponItem.WearOverride ??= inventory.GetWeaponEconItemWear(wrapper.WeaponItem);

@@ -328,23 +328,20 @@ public class PlayerInventory(
         )
         {
             var isKnife = slot == loadout_slot_t.LOADOUT_SLOT_FIRST_AUTO_BUY_WEAPON;
-            var weaponItem = isKnife
-                ? GetKnife(team, fallback)
-                : def.HasValue
-                    ? GetWeapon(team, def.Value, fallback)
-                    : null;
+            var weaponItem =
+                isKnife ? GetKnife(team, fallback)
+                : def.HasValue ? GetWeapon(team, def.Value, fallback)
+                : null;
             return weaponItem != null
                 ? InventoryItemWrapper.FromWeapon(weaponItem)
                 : InventoryItemWrapper.Empty();
         }
-
         if (slot == loadout_slot_t.LOADOUT_SLOT_CLOTHING_CUSTOMPLAYER)
         {
             if (Agents.TryGetValue(team, out var agentItem) && agentItem.Def != null)
                 return InventoryItemWrapper.FromAgent(agentItem);
             return InventoryItemWrapper.Empty();
         }
-
         if (slot == loadout_slot_t.LOADOUT_SLOT_FIRST_COSMETIC)
         {
             var gloveItem = GetGloves(team, fallback);
@@ -352,19 +349,18 @@ public class PlayerInventory(
                 ? InventoryItemWrapper.FromGlove(gloveItem)
                 : InventoryItemWrapper.Empty();
         }
-
         if (slot == loadout_slot_t.LOADOUT_SLOT_FLAIR0)
         {
-            return Pin.HasValue ? InventoryItemWrapper.FromPin(Pin.Value) : InventoryItemWrapper.Empty();
+            return Pin.HasValue
+                ? InventoryItemWrapper.FromPin(Pin.Value)
+                : InventoryItemWrapper.Empty();
         }
-
         if (slot == loadout_slot_t.LOADOUT_SLOT_MUSICKIT)
         {
             return MusicKit != null
                 ? InventoryItemWrapper.FromMusicKit(MusicKit)
                 : InventoryItemWrapper.Empty();
         }
-
         return InventoryItemWrapper.Empty();
     }
 }
