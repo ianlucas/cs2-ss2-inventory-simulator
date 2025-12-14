@@ -163,6 +163,12 @@ public static class Natives
             CEconItemView_OperatorEquals.Call(ptr, copyFrom);
         return ptr;
     }
+
+    public static void FreeMemory(nint ptr)
+    {
+        if (ptr != 0)
+            Marshal.FreeHGlobal(ptr);
+    }
 }
 
 public static class CCSPlayerPawnExtensions

@@ -72,6 +72,13 @@ public partial class InventorySimulator
         }
         if (PlayerOnTickInventoryManager.TryGetValue(steamId, out var tuple))
             PlayerOnTickInventoryManager[steamId] = (null, tuple.Item2);
+        var prefix = $"{steamId}_";
+        var keysToRemove = CreatedEconItemViewPointers
+            .Keys.Where(key => key.StartsWith(prefix))
+            .ToList();
+        foreach (var key in keysToRemove)
+            if (CreatedEconItemViewPointers.TryRemove(key, out var ptr))
+                Natives.FreeMemory(ptr);
     }
 
     public void ClearPlayerUseCmd(ulong steamId)
