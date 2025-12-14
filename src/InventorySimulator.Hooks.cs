@@ -83,9 +83,11 @@ public partial class InventorySimulator
             var nativeInventory = new CCSPlayerInventory(thisPtr);
             if (nativeInventory.IsValid)
             {
-                var item = Core.Memory.ToSchemaClass<CEconItemView>(ret);
-                if (item.IsValid)
+                var baseItem = Core.Memory.ToSchemaClass<CEconItemView>(ret);
+                if (baseItem.IsValid)
                 {
+                    var newItemPtr = Natives.CreateEconItemView(copyFrom: ret);
+                    var item = Core.Memory.ToSchemaClass<CEconItemView>(newItemPtr);
                     var steamId = nativeInventory.SOCache.Owner.SteamID;
                     var isFallbackTeam = IsFallbackTeam.Value;
                     var inventory = GetPlayerInventoryBySteamID(
@@ -171,6 +173,8 @@ public partial class InventorySimulator
                         Console.WriteLine(
                             $"[GetItemInLoadout$] inventory={nativeInventory.Address} team={(Team)team} slot={(loadout_slot_t)slot} def={item.ItemDefinitionIndex}"
                         );
+
+                    return newItemPtr;
                 }
             }
             return ret;

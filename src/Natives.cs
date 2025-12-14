@@ -3,6 +3,7 @@
 *  Licensed under the MIT License. See License.txt in the project root for license information.
 *--------------------------------------------------------------------------------------------*/
 
+using System.Runtime.InteropServices;
 using SwiftlyS2.Shared;
 using SwiftlyS2.Shared.Memory;
 using SwiftlyS2.Shared.SchemaDefinitions;
@@ -13,6 +14,8 @@ namespace InventorySimulator;
 public static class Natives
 {
     private static ISwiftlyCore? _core;
+
+    public const int CEconItemView_Size = 1200;
 
     public delegate nint CCSPlayer_ItemServices_GiveNamedItemDelegate(
         nint thisPtr,
@@ -37,6 +40,10 @@ public static class Natives
         int iTeam,
         int iSlot
     );
+
+    public delegate nint CEconItemView_ConstructorDelegate(nint thisPtr);
+
+    public delegate nint CEconItemView_OperatorEqualsDelegate(nint thisPtr, nint other);
 
     private static readonly Lazy<
         IUnmanagedFunction<CCSPlayer_ItemServices_GiveNamedItemDelegate>
@@ -68,6 +75,18 @@ public static class Natives
         )
     );
 
+    private static readonly Lazy<
+        IUnmanagedFunction<CEconItemView_ConstructorDelegate>
+    > _lazyEconItemViewConstructor = new(() =>
+        FromSignature<CEconItemView_ConstructorDelegate>("CEconItemView::CEconItemView")
+    );
+
+    private static readonly Lazy<
+        IUnmanagedFunction<CEconItemView_OperatorEqualsDelegate>
+    > _lazyEconItemViewOperatorEquals = new(() =>
+        FromSignature<CEconItemView_OperatorEqualsDelegate>("CEconItemView::operator=")
+    );
+
     public static IUnmanagedFunction<CCSPlayer_ItemServices_GiveNamedItemDelegate> CCSPlayer_ItemServices_GiveNamedItem =>
         _lazyGiveNamedItem.Value;
 
@@ -79,6 +98,12 @@ public static class Natives
 
     public static IUnmanagedFunction<CCSPlayerInventory_GetItemInLoadoutDelegate> CCSPlayerInventory_GetItemInLoadout =>
         _lazyGetItemInLoadout.Value;
+
+    public static IUnmanagedFunction<CEconItemView_ConstructorDelegate> CEconItemView_Constructor =>
+        _lazyEconItemViewConstructor.Value;
+
+    public static IUnmanagedFunction<CEconItemView_OperatorEqualsDelegate> CEconItemView_OperatorEquals =>
+        _lazyEconItemViewOperatorEquals.Value;
 
     public static int CCSPlayerInventory_m_pSOCache =>
         new Lazy<int>(() => FromOffset("CCSPlayerInventory::m_pSOCache")).Value;
@@ -128,6 +153,15 @@ public static class Natives
     public static void Initialize(ISwiftlyCore core)
     {
         _core = core;
+    }
+
+    public static nint CreateEconItemView(nint copyFrom = 0)
+    {
+        nint ptr = Marshal.AllocHGlobal(CEconItemView_Size);
+        CEconItemView_Constructor.Call(ptr);
+        if (copyFrom != 0)
+            CEconItemView_OperatorEquals.Call(ptr, copyFrom);
+        return ptr;
     }
 }
 
