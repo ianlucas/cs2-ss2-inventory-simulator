@@ -15,9 +15,7 @@ public partial class InventorySimulator
 {
     public void ApplyGloveAttributesFromItem(CEconItemView glove, BaseEconItem item)
     {
-        glove.Initialized = true;
         glove.ItemDefinitionIndex = item.Def;
-        UpdateEconItemID(glove);
         glove.NetworkedDynamicAttributes.Attributes.RemoveAll();
         glove.NetworkedDynamicAttributes.SetOrAddAttribute("set item texture prefab", item.Paint);
         glove.NetworkedDynamicAttributes.SetOrAddAttribute("set item texture seed", item.Seed);
@@ -112,13 +110,10 @@ public partial class InventorySimulator
 
     public void UpdateEconItemID(CEconItemView econItemView)
     {
-        // ItemID serves as a global identifier for items. Since we're
-        // simulating it, we're using arbitrary large numbers.
         var itemId = NextItemId++;
         econItemView.ItemID = itemId;
-        // @see https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/game/shared/econ/econ_item_view.h#L313
-        econItemView.ItemIDLow = (uint)itemId & 0xFFFFFFFF;
-        econItemView.ItemIDHigh = (uint)itemId >> 32;
+        econItemView.ItemIDLow = (uint)(itemId & 0xFFFFFFFF);
+        econItemView.ItemIDHigh = (uint)(itemId >> 32);
     }
 
     public bool IsCustomWeaponItemID(CBasePlayerWeapon weapon)

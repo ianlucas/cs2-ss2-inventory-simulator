@@ -69,14 +69,6 @@ public partial class InventorySimulator
                 }
             }
             var ret = next()(thisPtr, pchName, a3, pScriptItem, a5, a6);
-            //
-            // if (designerName != null && !designerName.Contains("weapon"))
-            //     return ret;
-            // var itemServices = Core.Memory.ToSchemaClass<CCSPlayer_ItemServices>(thisPtr);
-            // var weapon = Core.Memory.ToSchemaClass<CBasePlayerWeapon>(ret);
-            // var player = GetPlayerFromItemServices(itemServices);
-            // if (player != null)
-            //     GivePlayerWeaponSkin(player, weapon);
             return ret;
         };
     }
@@ -94,16 +86,11 @@ public partial class InventorySimulator
                 var item = Core.Memory.ToSchemaClass<CEconItemView>(ret);
                 if (item.IsValid)
                 {
-                    ;
-                    // Console.WriteLine(
-                    //     $"[GetItemInLoadout^] inventory={nativeInventory.Address} team={(Team)team} slot={(loadout_slot_t)slot} def={item.ItemDefinitionIndex}"
-                    // );
                     var steamId = nativeInventory.SOCache.Owner.SteamID;
                     var isFallbackTeam = IsFallbackTeam.Value;
                     var inventory = GetPlayerInventoryBySteamID(
                         nativeInventory.SOCache.Owner.SteamID
                     );
-                    item.AccountID = new CSteamID(steamId).GetAccountID().m_AccountID;
                     if (
                         (loadout_slot_t)slot >= loadout_slot_t.LOADOUT_SLOT_MELEE
                         && (loadout_slot_t)slot <= loadout_slot_t.LOADOUT_SLOT_EQUIPMENT5
@@ -119,16 +106,12 @@ public partial class InventorySimulator
                                 item.ItemDefinitionIndex,
                                 isFallbackTeam
                             );
-                        // Console.WriteLine(
-                        //     $"[GetItemInLoadout] inventory={nativeInventory.Address} slot={(loadout_slot_t)slot} designerName={item.GetDesignerName()} def={item.ItemDefinitionIndex} isKnife={isKnife} cs2IsKnife={item.IsMelee()} weaponItem.Def={weaponItem?.Def}"
-                        // );
                         if (weaponItem != null)
                         {
+                            UpdateEconItemID(item);
+                            item.AccountID = new CSteamID(steamId).GetAccountID().m_AccountID;
                             weaponItem.WearOverride ??= inventory.GetWeaponEconItemWear(weaponItem);
                             ApplyWeaponAttributesFromItem(item, weaponItem);
-                            // Console.WriteLine(
-                            //     $"[GetItemInLoadout!] inventory={nativeInventory.Address} slot={(loadout_slot_t)slot} designerName={item.GetDesignerName()} def={item.ItemDefinitionIndex}"
-                            // );
                         }
                     }
                     else if (
@@ -137,6 +120,8 @@ public partial class InventorySimulator
                         && agentItem.Def != null
                     )
                     {
+                        UpdateEconItemID(item);
+                        item.AccountID = new CSteamID(steamId).GetAccountID().m_AccountID;
                         item.ItemDefinitionIndex = agentItem.Def.Value;
                         for (var i = 0; i < agentItem.Patches.Count; i++)
                         {
@@ -154,17 +139,27 @@ public partial class InventorySimulator
                     {
                         var gloveItem = inventory.GetGloves((byte)team, isFallbackTeam);
                         if (gloveItem != null)
+                        {
+                            UpdateEconItemID(item);
+                            item.AccountID = new CSteamID(steamId).GetAccountID().m_AccountID;
                             ApplyGloveAttributesFromItem(item, gloveItem);
+                        }
                     }
                     else if ((loadout_slot_t)slot == loadout_slot_t.LOADOUT_SLOT_FLAIR0)
                     {
                         if (inventory.Pin != null)
+                        {
+                            UpdateEconItemID(item);
+                            item.AccountID = new CSteamID(steamId).GetAccountID().m_AccountID;
                             item.ItemDefinitionIndex = (ushort)inventory.Pin.Value;
+                        }
                     }
                     else if ((loadout_slot_t)slot == loadout_slot_t.LOADOUT_SLOT_MUSICKIT)
                     {
                         if (inventory.MusicKit != null)
                         {
+                            UpdateEconItemID(item);
+                            item.AccountID = new CSteamID(steamId).GetAccountID().m_AccountID;
                             item.NetworkedDynamicAttributes.Attributes.RemoveAll();
                             item.NetworkedDynamicAttributes.SetOrAddAttribute(
                                 "music id",
