@@ -6,6 +6,7 @@
 using System.Text.Json.Serialization;
 using CS2Lib.SwiftlyCS2.Core;
 using SwiftlyS2.Shared.Players;
+using SwiftlyS2.Shared.SchemaDefinitions;
 
 namespace InventorySimulator;
 
@@ -173,6 +174,36 @@ public class GraffitiItem
     public required int Tint { get; set; }
 }
 
+public class InventoryItemWrapper
+{
+    public WeaponEconItem? WeaponItem { get; set; }
+    public AgentItem? AgentItem { get; set; }
+    public BaseEconItem? GloveItem { get; set; }
+    public uint? PinItem { get; set; }
+    public MusicKitItem? MusicKitItem { get; set; }
+
+    public bool HasItem =>
+        WeaponItem != null
+        || AgentItem != null
+        || GloveItem != null
+        || PinItem != null
+        || MusicKitItem != null;
+
+    public static InventoryItemWrapper FromWeapon(WeaponEconItem item) =>
+        new() { WeaponItem = item };
+
+    public static InventoryItemWrapper FromAgent(AgentItem item) => new() { AgentItem = item };
+
+    public static InventoryItemWrapper FromGlove(BaseEconItem item) => new() { GloveItem = item };
+
+    public static InventoryItemWrapper FromPin(uint item) => new() { PinItem = item };
+
+    public static InventoryItemWrapper FromMusicKit(MusicKitItem item) =>
+        new() { MusicKitItem = item };
+
+    public static InventoryItemWrapper Empty() => new();
+}
+
 [method: JsonConstructor]
 public class PlayerInventory(
     Dictionary<byte, WeaponEconItem>? knives = null,
@@ -282,5 +313,58 @@ public class PlayerInventory(
             }
             wear += 0.001f;
         }
+    }
+
+    public InventoryItemWrapper GetItemForSlot(
+        loadout_slot_t slot,
+        byte team,
+        ushort? def,
+        bool fallback
+    )
+    {
+        if (
+            slot >= loadout_slot_t.LOADOUT_SLOT_MELEE
+            && slot <= loadout_slot_t.LOADOUT_SLOT_EQUIPMENT5
+        )
+        {
+            var isKnife = slot == loadout_slot_t.LOADOUT_SLOT_FIRST_AUTO_BUY_WEAPON;
+            var weaponItem = isKnife
+                ? GetKnife(team, fallback)
+                : def.HasValue
+                    ? GetWeapon(team, def.Value, fallback)
+                    : null;
+            return weaponItem != null
+                ? InventoryItemWrapper.FromWeapon(weaponItem)
+                : InventoryItemWrapper.Empty();
+        }
+
+        if (slot == loadout_slot_t.LOADOUT_SLOT_CLOTHING_CUSTOMPLAYER)
+        {
+            if (Agents.TryGetValue(team, out var agentItem) && agentItem.Def != null)
+                return InventoryItemWrapper.FromAgent(agentItem);
+            return InventoryItemWrapper.Empty();
+        }
+
+        if (slot == loadout_slot_t.LOADOUT_SLOT_FIRST_COSMETIC)
+        {
+            var gloveItem = GetGloves(team, fallback);
+            return gloveItem != null
+                ? InventoryItemWrapper.FromGlove(gloveItem)
+                : InventoryItemWrapper.Empty();
+        }
+
+        if (slot == loadout_slot_t.LOADOUT_SLOT_FLAIR0)
+        {
+            return Pin.HasValue ? InventoryItemWrapper.FromPin(Pin.Value) : InventoryItemWrapper.Empty();
+        }
+
+        if (slot == loadout_slot_t.LOADOUT_SLOT_MUSICKIT)
+        {
+            return MusicKit != null
+                ? InventoryItemWrapper.FromMusicKit(MusicKit)
+                : InventoryItemWrapper.Empty();
+        }
+
+        return InventoryItemWrapper.Empty();
     }
 }

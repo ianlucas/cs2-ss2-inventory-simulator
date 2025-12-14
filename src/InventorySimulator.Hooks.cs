@@ -81,103 +81,27 @@ public partial class InventorySimulator
         {
             var ret = next()(thisPtr, team, slot);
             var nativeInventory = new CCSPlayerInventory(thisPtr);
-            if (nativeInventory.IsValid)
-            {
-                var baseItem = Core.Memory.ToSchemaClass<CEconItemView>(ret);
-                if (baseItem.IsValid)
-                {
-                    var newItemPtr = Natives.CreateEconItemView(copyFrom: ret);
-                    var item = Core.Memory.ToSchemaClass<CEconItemView>(newItemPtr);
-                    var steamId = nativeInventory.SOCache.Owner.SteamID;
-                    var isFallbackTeam = IsFallbackTeam.Value;
-                    var inventory = GetPlayerInventoryBySteamID(
-                        nativeInventory.SOCache.Owner.SteamID
-                    );
-                    if (
-                        (loadout_slot_t)slot >= loadout_slot_t.LOADOUT_SLOT_MELEE
-                        && (loadout_slot_t)slot <= loadout_slot_t.LOADOUT_SLOT_EQUIPMENT5
-                    )
-                    {
-                        var isKnife =
-                            (loadout_slot_t)slot
-                            == loadout_slot_t.LOADOUT_SLOT_FIRST_AUTO_BUY_WEAPON;
-                        var weaponItem = isKnife
-                            ? inventory.GetKnife((byte)team, isFallbackTeam)
-                            : inventory.GetWeapon(
-                                (byte)team,
-                                item.ItemDefinitionIndex,
-                                isFallbackTeam
-                            );
-                        if (weaponItem != null)
-                        {
-                            UpdateEconItemID(item);
-                            item.AccountID = new CSteamID(steamId).GetAccountID().m_AccountID;
-                            weaponItem.WearOverride ??= inventory.GetWeaponEconItemWear(weaponItem);
-                            ApplyWeaponAttributesFromItem(item, weaponItem);
-                        }
-                    }
-                    else if (
-                        (loadout_slot_t)slot == loadout_slot_t.LOADOUT_SLOT_CLOTHING_CUSTOMPLAYER
-                        && inventory.Agents.TryGetValue((byte)team, out var agentItem)
-                        && agentItem.Def != null
-                    )
-                    {
-                        UpdateEconItemID(item);
-                        item.AccountID = new CSteamID(steamId).GetAccountID().m_AccountID;
-                        item.ItemDefinitionIndex = agentItem.Def.Value;
-                        for (var i = 0; i < agentItem.Patches.Count; i++)
-                        {
-                            var patch = agentItem.Patches[i];
-                            if (patch != 0)
-                            {
-                                item.AttributeList.SetOrAddAttribute(
-                                    $"sticker slot {i} id",
-                                    UnsafeHelpers.ViewAs<uint, float>(patch)
-                                );
-                            }
-                        }
-                    }
-                    else if ((loadout_slot_t)slot == loadout_slot_t.LOADOUT_SLOT_FIRST_COSMETIC)
-                    {
-                        var gloveItem = inventory.GetGloves((byte)team, isFallbackTeam);
-                        if (gloveItem != null)
-                        {
-                            UpdateEconItemID(item);
-                            item.AccountID = new CSteamID(steamId).GetAccountID().m_AccountID;
-                            ApplyGloveAttributesFromItem(item, gloveItem);
-                        }
-                    }
-                    else if ((loadout_slot_t)slot == loadout_slot_t.LOADOUT_SLOT_FLAIR0)
-                    {
-                        if (inventory.Pin != null)
-                        {
-                            UpdateEconItemID(item);
-                            item.AccountID = new CSteamID(steamId).GetAccountID().m_AccountID;
-                            item.ItemDefinitionIndex = (ushort)inventory.Pin.Value;
-                        }
-                    }
-                    else if ((loadout_slot_t)slot == loadout_slot_t.LOADOUT_SLOT_MUSICKIT)
-                    {
-                        if (inventory.MusicKit != null)
-                        {
-                            UpdateEconItemID(item);
-                            item.AccountID = new CSteamID(steamId).GetAccountID().m_AccountID;
-                            item.NetworkedDynamicAttributes.Attributes.RemoveAll();
-                            item.NetworkedDynamicAttributes.SetOrAddAttribute(
-                                "music id",
-                                UnsafeHelpers.ViewAs<int, float>(inventory.MusicKit.Def)
-                            );
-                        }
-                    }
-                    else
-                        Console.WriteLine(
-                            $"[GetItemInLoadout$] inventory={nativeInventory.Address} team={(Team)team} slot={(loadout_slot_t)slot} def={item.ItemDefinitionIndex}"
-                        );
-
-                    return newItemPtr;
-                }
-            }
-            return ret;
+            if (!nativeInventory.IsValid)
+                return ret;
+            var baseItem = Core.Memory.ToSchemaClass<CEconItemView>(ret);
+            if (!baseItem.IsValid)
+                return ret;
+            var steamId = nativeInventory.SOCache.Owner.SteamID;
+            var isFallbackTeam = IsFallbackTeam.Value;
+            var inventory = GetPlayerInventoryBySteamID(nativeInventory.SOCache.Owner.SteamID);
+            var slotType = (loadout_slot_t)slot;
+            var itemWrapper = inventory.GetItemForSlot(
+                slotType,
+                (byte)team,
+                baseItem.ItemDefinitionIndex,
+                isFallbackTeam
+            );
+            if (!itemWrapper.HasItem)
+                return ret;
+            var newItemPtr = Natives.CreateEconItemView(copyFrom: ret);
+            var item = Core.Memory.ToSchemaClass<CEconItemView>(newItemPtr);
+            ApplyAttributesFromWrapper(item, itemWrapper, inventory, steamId);
+            return newItemPtr;
         };
     }
 }
