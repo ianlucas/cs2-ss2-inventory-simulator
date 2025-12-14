@@ -15,7 +15,7 @@ public static class Natives
 {
     private static ISwiftlyCore? _core;
 
-    public const int CEconItemView_Size = 1200;
+    public const int CEconItemView_Size = 1024;
 
     public delegate nint CCSPlayer_ItemServices_GiveNamedItemDelegate(
         nint thisPtr,
@@ -157,7 +157,7 @@ public static class Natives
 
     public static nint CreateEconItemView(nint copyFrom = 0)
     {
-        nint ptr = Marshal.AllocHGlobal(CEconItemView_Size);
+        var ptr = Marshal.AllocHGlobal(CEconItemView_Size);
         CEconItemView_Constructor.Call(ptr);
         if (copyFrom != 0)
             CEconItemView_OperatorEquals.Call(ptr, copyFrom);
