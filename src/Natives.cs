@@ -45,7 +45,7 @@ public static class Natives
 
     public delegate nint CEconItemView_OperatorEqualsDelegate(nint thisPtr, nint other);
 
-    public delegate nint CCSPlayerInventory_ResetDelegate(nint thisPtr);
+    public delegate nint CPlayerInventory_SendInventoryUpdateEventDelegate(nint thisPtr);
 
     private static readonly Lazy<
         IUnmanagedFunction<CCSPlayer_ItemServices_GiveNamedItemDelegate>
@@ -90,9 +90,11 @@ public static class Natives
     );
 
     private static readonly Lazy<
-        IUnmanagedFunction<CCSPlayerInventory_ResetDelegate>
-    > _lazyPlayerInventoryReset = new(() =>
-        FromSignature<CCSPlayerInventory_ResetDelegate>("CCSPlayerInventory::Reset")
+        IUnmanagedFunction<CPlayerInventory_SendInventoryUpdateEventDelegate>
+    > _lazyPlayerInventorySendInventoryUpdateEvent = new(() =>
+        FromSignature<CPlayerInventory_SendInventoryUpdateEventDelegate>(
+            "CPlayerInventory::SendInventoryUpdateEvent"
+        )
     );
 
     public static IUnmanagedFunction<CCSPlayer_ItemServices_GiveNamedItemDelegate> CCSPlayer_ItemServices_GiveNamedItem =>
@@ -113,8 +115,8 @@ public static class Natives
     public static IUnmanagedFunction<CEconItemView_OperatorEqualsDelegate> CEconItemView_OperatorEquals =>
         _lazyEconItemViewOperatorEquals.Value;
 
-    public static IUnmanagedFunction<CCSPlayerInventory_ResetDelegate> CCSPlayerInventory_Reset =>
-        _lazyPlayerInventoryReset.Value;
+    public static IUnmanagedFunction<CPlayerInventory_SendInventoryUpdateEventDelegate> CPlayerInventory_SendInventoryUpdateEvent =>
+        _lazyPlayerInventorySendInventoryUpdateEvent.Value;
 
     public static int CCSPlayerInventory_m_pSOCache =>
         new Lazy<int>(() => FromOffset("CCSPlayerInventory::m_pSOCache")).Value;

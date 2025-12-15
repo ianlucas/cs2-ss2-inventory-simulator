@@ -174,7 +174,7 @@ public partial class InventorySimulator
     {
         var inventory = player.Controller.InventoryServices?.GetInventory();
         if (inventory != null && inventory.IsValid)
-            Natives.CCSPlayerInventory_Reset.Call(inventory.Address);
+            Natives.CPlayerInventory_SendInventoryUpdateEvent.Call(inventory.Address);
     }
 
     public void GiveOnRefreshPlayerInventory(IPlayer player, PlayerInventory oldInventory)
