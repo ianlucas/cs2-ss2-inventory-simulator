@@ -26,6 +26,7 @@ public partial class InventorySimulator(ISwiftlyCore core) : BasePlugin(core)
     {
         Natives.Initialize(Core);
         Core.Event.OnEntityCreated += OnEntityCreated;
+        Core.Event.OnEntityDeleted += OnEntityDeleted;
         Core.Event.OnConVarValueChanged += OnConVarValueChanged;
         Core.Event.OnClientProcessUsercmds += OnClientProcessUsercmds;
         Core.GameEvent.HookPost<EventPlayerConnect>(OnPlayerConnect);

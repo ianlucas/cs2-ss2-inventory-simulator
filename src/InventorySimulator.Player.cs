@@ -6,6 +6,7 @@
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using SwiftlyS2.Shared.Players;
+using SwiftlyS2.Shared.SchemaDefinitions;
 using IOFile = System.IO.File;
 
 namespace InventorySimulator;
@@ -42,17 +43,6 @@ public partial class InventorySimulator
         PlayerInventoryManager[steamId] = inventory;
     }
 
-    public void ClearInventoryManager()
-    {
-        var connected = Core
-            .PlayerManager.GetAllPlayers()
-            .Select(player => player.SteamID)
-            .ToHashSet();
-        var disconnected = PlayerInventoryManager.Keys.Except(connected).ToList();
-        foreach (var steamId in disconnected)
-            ClearPlayerInventory(steamId);
-    }
-
     public void ClearPlayerInventory(ulong steamId)
     {
         if (!LoadedPlayerInventory.ContainsKey(steamId))
@@ -61,15 +51,50 @@ public partial class InventorySimulator
             PlayerCooldownManager.Remove(steamId, out _);
             PlayerSprayCooldownManager.Remove(steamId, out _);
         }
+    }
+
+    public void ClearPlayerEconItemViewPointers(ulong steamId)
+    {
         var prefix = $"{steamId}_";
         var keysToRemove = CreatedEconItemViewPointers
             .Keys.Where(key => key.StartsWith(prefix))
             .ToList();
         foreach (var key in keysToRemove)
-        {
             if (CreatedEconItemViewPointers.TryRemove(key, out var ptr))
                 Natives.FreeMemory(ptr);
+    }
+
+    public void UpdatePlayerControllerSteamID(IPlayer player)
+    {
+        var steamID = player.Controller.SteamID;
+        var index = player.Controller.Index;
+        try
+        {
+            if (ControllerSteamIDManager.TryGetValue(index, out var oldSteamID))
+                if (oldSteamID != steamID)
+                {
+                    foreach (var (oldIndex, otherSteamID) in ControllerSteamIDManager)
+                        if (oldIndex != index && oldSteamID == otherSteamID)
+                            return;
+                    ClearPlayerInventory(oldSteamID);
+                }
         }
+        finally
+        {
+            ControllerSteamIDManager[index] = steamID;
+        }
+    }
+
+    public void ClearPlayerControllerSteamID(CCSPlayerController controller)
+    {
+        if (!controller.IsValid)
+            return;
+        var steamID = controller.SteamID;
+        ControllerSteamIDManager.TryRemove(controller.Index, out _);
+        foreach (var (oldIndex, otherSteamID) in ControllerSteamIDManager)
+            if (oldIndex != controller.Index && steamID == otherSteamID)
+                return;
+        ClearPlayerInventory(steamID);
     }
 
     public void ClearPlayerUseCmd(ulong steamId)
@@ -89,9 +114,9 @@ public partial class InventorySimulator
 
     public PlayerInventory GetPlayerInventory(IPlayer player)
     {
-        return PlayerInventoryManager.TryGetValue(player.SteamID, out var inventory)
-            ? inventory
-            : EmptyInventory;
+        if (PlayerInventoryManager.TryGetValue(player.SteamID, out var inventory))
+            return inventory;
+        return EmptyInventory;
     }
 
     public PlayerInventory GetPlayerInventoryBySteamID(ulong steamID)

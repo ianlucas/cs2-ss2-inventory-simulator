@@ -20,6 +20,7 @@ public partial class InventorySimulator
     public readonly ConcurrentDictionary<ulong, bool> PlayerUseCmdBlockManager = [];
     public readonly ConcurrentDictionary<ulong, Action> PlayerInventoryPostFetchHandlers = [];
     public readonly ConcurrentDictionary<string, nint> CreatedEconItemViewPointers = [];
+    public readonly ConcurrentDictionary<uint, ulong> ControllerSteamIDManager = [];
 
     public readonly PlayerInventory EmptyInventory = new();
 

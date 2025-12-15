@@ -50,4 +50,16 @@ public partial class InventorySimulator
             return;
         SprayPlayerGraffitiThruPlayerButtons(Core.PlayerManager.GetPlayer(@event.PlayerId));
     }
+
+    public void OnEntityDeleted(IOnEntityDeletedEvent @event)
+    {
+        var entity = @event.Entity;
+        var designerName = entity.DesignerName;
+        if (designerName == "cs_player_controller")
+        {
+            var controller = entity.As<CCSPlayerController>();
+            if (controller.SteamID != 0)
+                ClearPlayerControllerSteamID(controller);
+        }
+    }
 }

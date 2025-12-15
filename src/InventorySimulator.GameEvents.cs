@@ -30,6 +30,7 @@ public partial class InventorySimulator
     public void OnPlayerConnect(IPlayer player)
     {
         RefreshPlayerInventory(player);
+        UpdatePlayerControllerSteamID(player);
     }
 
     public HookResult OnPlayerDeathPre(EventPlayerDeath @event)
@@ -64,7 +65,7 @@ public partial class InventorySimulator
             ClearPlayerUseCmd(steamId);
             ClearPlayerInventoryPostFetchHandler(steamId);
             ClearPlayerInventory(steamId);
-            ClearInventoryManager();
+            ClearPlayerEconItemViewPointers(steamId);
         }
         return HookResult.Continue;
     }
