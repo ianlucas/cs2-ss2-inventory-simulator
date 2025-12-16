@@ -169,19 +169,19 @@ public class AgentItem
     public ushort? Def { get; set; }
 
     [JsonPropertyName("model")]
-    public required string Model { get; set; }
+    public string Model { get; set; } = "";
 
     [JsonPropertyName("patches")]
-    public required List<uint> Patches { get; set; }
+    public List<uint> Patches { get; set; } = [];
 
     [JsonPropertyName("vofallback")]
-    public required bool VoFallback { get; set; }
+    public bool VoFallback { get; set; } = false;
 
     [JsonPropertyName("vofemale")]
-    public required bool VoFemale { get; set; }
+    public bool VoFemale { get; set; } = false;
 
     [JsonPropertyName("voprefix")]
-    public required string VoPrefix { get; set; }
+    public string VoPrefix { get; set; } = "";
 }
 
 public class MusicKitItem
@@ -350,7 +350,8 @@ public class PlayerInventory(
         loadout_slot_t slot,
         byte team,
         ushort? def,
-        bool fallback
+        bool fallback,
+        int minModels
     )
     {
         if (
@@ -358,7 +359,7 @@ public class PlayerInventory(
             && slot <= loadout_slot_t.LOADOUT_SLOT_EQUIPMENT5
         )
         {
-            var isKnife = slot == loadout_slot_t.LOADOUT_SLOT_FIRST_AUTO_BUY_WEAPON;
+            var isKnife = slot == loadout_slot_t.LOADOUT_SLOT_MELEE;
             var weaponItem =
                 isKnife ? GetKnife(team, fallback)
                 : def.HasValue ? GetWeapon(team, def.Value, fallback)
@@ -369,11 +370,15 @@ public class PlayerInventory(
         }
         if (slot == loadout_slot_t.LOADOUT_SLOT_CLOTHING_CUSTOMPLAYER)
         {
+            if (minModels > 0)
+                return team == (byte)Team.T
+                    ? InventoryItemWrapper.FromAgent(new AgentItem { Def = 5036 })
+                    : InventoryItemWrapper.FromAgent(new AgentItem { Def = 5037 });
             if (Agents.TryGetValue(team, out var agentItem) && agentItem.Def != null)
                 return InventoryItemWrapper.FromAgent(agentItem);
             return InventoryItemWrapper.Empty();
         }
-        if (slot == loadout_slot_t.LOADOUT_SLOT_FIRST_COSMETIC)
+        if (slot == loadout_slot_t.LOADOUT_SLOT_CLOTHING_HANDS)
         {
             var gloveItem = GetGloves(team, fallback);
             return gloveItem != null

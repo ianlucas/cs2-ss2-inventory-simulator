@@ -58,7 +58,7 @@ public partial class InventorySimulator
                         pScriptItem = Natives.CCSPlayerInventory_GetItemInLoadout.Call(
                             inventory.Address,
                             controller.TeamNum,
-                            (int)loadout_slot_t.LOADOUT_SLOT_FIRST_AUTO_BUY_WEAPON
+                            (int)loadout_slot_t.LOADOUT_SLOT_MELEE
                         );
                 }
             }
@@ -88,7 +88,8 @@ public partial class InventorySimulator
                 slotType,
                 (byte)team,
                 baseItem.ItemDefinitionIndex,
-                isFallbackTeam
+                isFallbackTeam,
+                MinModels.Value
             );
             if (!itemWrapper.HasItem)
                 return ret;
