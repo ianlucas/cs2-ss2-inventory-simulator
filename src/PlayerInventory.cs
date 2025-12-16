@@ -78,6 +78,37 @@ public class BaseEconItem
     public float Wear { get; set; }
 
     public float? WearOverride;
+
+    public override int GetHashCode()
+    {
+        return base.GetHashCode();
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is not BaseEconItem other)
+            return false;
+
+        return Def == other.Def
+            && Paint == other.Paint
+            && Seed == other.Seed
+            && Wear == other.Wear
+            && WearOverride == other.WearOverride;
+    }
+
+    public static bool operator ==(BaseEconItem? left, BaseEconItem? right)
+    {
+        if (ReferenceEquals(left, right))
+            return true;
+        if (left is null || right is null)
+            return false;
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(BaseEconItem? left, BaseEconItem? right)
+    {
+        return !(left == right);
+    }
 }
 
 public class WeaponEconItem : BaseEconItem

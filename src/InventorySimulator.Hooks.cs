@@ -23,7 +23,7 @@ public partial class InventorySimulator
                 if (!PlayerInventoryManager.ContainsKey(player.SteamID))
                 {
                     PlayerInventoryPostFetchHandlers[player.SteamID] = () =>
-                        Core.Scheduler.NextTick(() =>
+                        Core.Scheduler.NextWorldUpdate(() =>
                         {
                             if (player.Controller.IsValid)
                                 Natives.CServerSideClientBase_ActivatePlayer.CallOriginal(thisPtr);

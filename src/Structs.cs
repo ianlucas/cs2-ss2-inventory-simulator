@@ -5,6 +5,8 @@
 
 using System.Runtime.InteropServices;
 using SwiftlyS2.Shared.Natives;
+using SwiftlyS2.Shared.Players;
+using SwiftlyS2.Shared.SchemaDefinitions;
 
 namespace InventorySimulator;
 
@@ -21,9 +23,12 @@ public class CCSPlayerInventory : INativeHandle
     }
 
     public CGCClientSharedObjectCache SOCache =>
-        new CGCClientSharedObjectCache(
-            Marshal.ReadIntPtr(Address + Natives.CCSPlayerInventory_m_pSOCache)
-        );
+        new(Marshal.ReadIntPtr(Address + Natives.CCSPlayerInventory_m_pSOCache));
+
+    public nint GetItemInLoadout(byte team, loadout_slot_t slot)
+    {
+        return Natives.CCSPlayerInventory_GetItemInLoadout.Call(Address, team, (int)slot);
+    }
 }
 
 // Thanks to @samyycX.

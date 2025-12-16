@@ -31,7 +31,7 @@ public partial class InventorySimulator
         {
             if (!IsSprayChangerEnabled.Value)
                 return;
-            Core.Scheduler.NextTick(() =>
+            Core.Scheduler.NextWorldUpdate(() =>
             {
                 var sprayDecal = entity.As<CPlayerSprayDecal>();
                 if (!sprayDecal.IsValid || sprayDecal.AccountID == 0)

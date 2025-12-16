@@ -47,6 +47,8 @@ public static class Natives
 
     public delegate nint CPlayerInventory_SendInventoryUpdateEventDelegate(nint thisPtr);
 
+    public delegate void CCSPlayer_ItemServices_UpdateWearablesDelegate(nint thisPtr);
+
     private static readonly Lazy<
         IUnmanagedFunction<CCSPlayer_ItemServices_GiveNamedItemDelegate>
     > _lazyGiveNamedItem = new(() =>
@@ -97,6 +99,14 @@ public static class Natives
         )
     );
 
+    private static readonly Lazy<
+        IUnmanagedFunction<CCSPlayer_ItemServices_UpdateWearablesDelegate>
+    > _lazyItemServicesUpdateWearables = new(() =>
+        FromSignature<CCSPlayer_ItemServices_UpdateWearablesDelegate>(
+            "CCSPlayer_ItemServices::UpdateWearables"
+        )
+    );
+
     public static IUnmanagedFunction<CCSPlayer_ItemServices_GiveNamedItemDelegate> CCSPlayer_ItemServices_GiveNamedItem =>
         _lazyGiveNamedItem.Value;
 
@@ -117,6 +127,9 @@ public static class Natives
 
     public static IUnmanagedFunction<CPlayerInventory_SendInventoryUpdateEventDelegate> CPlayerInventory_SendInventoryUpdateEvent =>
         _lazyPlayerInventorySendInventoryUpdateEvent.Value;
+
+    public static IUnmanagedFunction<CCSPlayer_ItemServices_UpdateWearablesDelegate> CCSPlayer_ItemServices_UpdateWearables =>
+        _lazyItemServicesUpdateWearables.Value;
 
     public static int CCSPlayerInventory_m_pSOCache =>
         new Lazy<int>(() => FromOffset("CCSPlayerInventory::m_pSOCache")).Value;

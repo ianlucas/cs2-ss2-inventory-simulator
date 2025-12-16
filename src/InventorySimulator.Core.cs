@@ -16,6 +16,36 @@ namespace InventorySimulator;
 
 public partial class InventorySimulator
 {
+    public void RegivePlayerGloves(
+        IPlayer player,
+        PlayerInventory inventory,
+        PlayerInventory oldInventory
+    )
+    {
+        var pawn = player.PlayerPawn;
+        var itemServices = pawn?.ItemServices;
+        if (pawn == null || itemServices == null)
+            return;
+        var isFallbackTeam = IsFallbackTeam.Value;
+        var item = inventory.GetGloves(player.Controller.TeamNum, isFallbackTeam);
+        var oldItem = oldInventory.GetGloves(player.Controller.TeamNum, isFallbackTeam);
+        if (oldItem == item)
+            return;
+        // Workaround by @daffyyyy.
+        var model = pawn.CBodyComponent?.SceneNode?.GetSkeletonInstance()?.ModelState.ModelName;
+        if (!string.IsNullOrEmpty(model))
+        {
+            pawn.SetModel("characters/models/tm_jumpsuit/tm_jumpsuit_varianta.vmdl");
+            pawn.SetModel(model);
+        }
+        Core.Scheduler.NextWorldUpdate(() =>
+        {
+            Console.WriteLine("Immediately updating glove.");
+            Natives.CCSPlayer_ItemServices_UpdateWearables.Call(itemServices.Address);
+            pawn.AcceptInput("SetBodygroup", "default_gloves,1");
+        });
+    }
+
     public void GivePlayerWeaponStatTrakIncrement(
         IPlayer player,
         string designerName,
@@ -63,7 +93,7 @@ public partial class InventorySimulator
         }
     }
 
-    public void GivePlayerCurrentWeapons(
+    public void RegivePlayerWeapons(
         IPlayer player,
         PlayerInventory inventory,
         PlayerInventory oldInventory
@@ -91,15 +121,19 @@ public partial class InventorySimulator
             )
             {
                 var entityDef = weapon.AttributeManager.Item.ItemDefinitionIndex;
-                var fallback = IsFallbackTeam.Value;
+                var isFallbackTeam = IsFallbackTeam.Value;
                 var oldItem =
                     data.GearSlot is gear_slot_t.GEAR_SLOT_KNIFE
-                        ? oldInventory.GetKnife(player.Controller.TeamNum, fallback)
-                        : oldInventory.GetWeapon(player.Controller.TeamNum, entityDef, fallback);
+                        ? oldInventory.GetKnife(player.Controller.TeamNum, isFallbackTeam)
+                        : oldInventory.GetWeapon(
+                            player.Controller.TeamNum,
+                            entityDef,
+                            isFallbackTeam
+                        );
                 var item =
                     data.GearSlot is gear_slot_t.GEAR_SLOT_KNIFE
-                        ? inventory.GetKnife(player.Controller.TeamNum, fallback)
-                        : inventory.GetWeapon(player.Controller.TeamNum, entityDef, fallback);
+                        ? inventory.GetKnife(player.Controller.TeamNum, isFallbackTeam)
+                        : inventory.GetWeapon(player.Controller.TeamNum, entityDef, isFallbackTeam);
                 if (oldItem == item)
                     continue;
                 var clip = weapon.Clip1;
@@ -149,7 +183,7 @@ public partial class InventorySimulator
                             weapon.Clip1Updated();
                             weapon.ReserveAmmo[0] = reserve;
                             weapon.ReserveAmmoUpdated();
-                            Core.Scheduler.NextTick(() =>
+                            Core.Scheduler.NextWorldUpdate(() =>
                             {
                                 if (active && player.IsValid)
                                 {
@@ -181,7 +215,10 @@ public partial class InventorySimulator
     {
         var inventory = GetPlayerInventory(player);
         if (IsWsImmediately.Value)
-            GivePlayerCurrentWeapons(player, inventory, oldInventory);
+        {
+            RegivePlayerWeapons(player, inventory, oldInventory);
+            RegivePlayerGloves(player, inventory, oldInventory);
+        }
     }
 
     public void GivePlayerGraffiti(IPlayer player, CPlayerSprayDecal sprayDecal)

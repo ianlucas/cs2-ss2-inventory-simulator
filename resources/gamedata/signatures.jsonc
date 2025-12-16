@@ -33,5 +33,10 @@
     "lib": "server",
     "windows": "",
     "linux": "31 C0 83 7F ? ? 75 ? 48 8B 47 ? 48 89 C7"
+  },
+  "CCSPlayer_ItemServices::UpdateWearables": {
+    "lib": "server",
+    "windows": "",
+    "linux": "55 48 89 E5 41 57 41 56 41 55 41 54 49 89 FC 53 48 83 EC ? 48 8B 5F ? 48 85 DB"
   }
 }
