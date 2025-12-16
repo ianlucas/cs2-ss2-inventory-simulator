@@ -182,6 +182,38 @@ public class AgentItem
 
     [JsonPropertyName("voprefix")]
     public string VoPrefix { get; set; } = "";
+
+    public override int GetHashCode()
+    {
+        return base.GetHashCode();
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is not AgentItem other)
+            return false;
+
+        return Def == other.Def
+            && Model == other.Model
+            && Patches.SequenceEqual(other.Patches)
+            && VoFallback == other.VoFallback
+            && VoFemale == other.VoFemale
+            && VoPrefix == other.VoPrefix;
+    }
+
+    public static bool operator ==(AgentItem? left, AgentItem? right)
+    {
+        if (ReferenceEquals(left, right))
+            return true;
+        if (left is null || right is null)
+            return false;
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(AgentItem? left, AgentItem? right)
+    {
+        return !(left == right);
+    }
 }
 
 public class MusicKitItem

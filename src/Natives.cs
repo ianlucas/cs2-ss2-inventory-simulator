@@ -49,6 +49,10 @@ public static class Natives
 
     public delegate void CCSPlayer_ItemServices_UpdateWearablesDelegate(nint thisPtr);
 
+    public delegate void CCSPlayerPawn_SetModelFromClassDelegate(nint thisPtr);
+
+    public delegate nint CCSPlayerPawn_UpdateModelFromLoadoutDelegate(nint thisPtr);
+
     private static readonly Lazy<
         IUnmanagedFunction<CCSPlayer_ItemServices_GiveNamedItemDelegate>
     > _lazyGiveNamedItem = new(() =>
@@ -107,6 +111,20 @@ public static class Natives
         )
     );
 
+    private static readonly Lazy<
+        IUnmanagedFunction<CCSPlayerPawn_SetModelFromClassDelegate>
+    > _lazyPlayerPawnSetModelFromClass = new(() =>
+        FromSignature<CCSPlayerPawn_SetModelFromClassDelegate>("CCSPlayerPawn::SetModelFromClass")
+    );
+
+    private static readonly Lazy<
+        IUnmanagedFunction<CCSPlayerPawn_UpdateModelFromLoadoutDelegate>
+    > _lazyPlayerPawnUpdateModelFromLoadout = new(() =>
+        FromSignature<CCSPlayerPawn_UpdateModelFromLoadoutDelegate>(
+            "CCSPlayerPawn::UpdateModelFromLoadout"
+        )
+    );
+
     public static IUnmanagedFunction<CCSPlayer_ItemServices_GiveNamedItemDelegate> CCSPlayer_ItemServices_GiveNamedItem =>
         _lazyGiveNamedItem.Value;
 
@@ -130,6 +148,12 @@ public static class Natives
 
     public static IUnmanagedFunction<CCSPlayer_ItemServices_UpdateWearablesDelegate> CCSPlayer_ItemServices_UpdateWearables =>
         _lazyItemServicesUpdateWearables.Value;
+
+    public static IUnmanagedFunction<CCSPlayerPawn_SetModelFromClassDelegate> CCSPlayerPawn_SetModelFromClass =>
+        _lazyPlayerPawnSetModelFromClass.Value;
+
+    public static IUnmanagedFunction<CCSPlayerPawn_UpdateModelFromLoadoutDelegate> CCSPlayerPawn_UpdateModelFromLoadout =>
+        _lazyPlayerPawnUpdateModelFromLoadout.Value;
 
     public static int CCSPlayerInventory_m_pSOCache =>
         new Lazy<int>(() => FromOffset("CCSPlayerInventory::m_pSOCache")).Value;
@@ -202,6 +226,16 @@ public static class CCSPlayerPawnExtensions
     public static bool IsAbleToApplySpray(this CCSPlayerPawn pawn, IntPtr ptr = 0)
     {
         return Natives.CCSPlayerPawn_IsAbleToApplySpray.Call(pawn.Address, ptr, 0, 0) == nint.Zero;
+    }
+
+    public static void UpdateModelFromLoadout(this CCSPlayerPawn pawn)
+    {
+        Natives.CCSPlayerPawn_UpdateModelFromLoadout.Call(pawn.Address);
+    }
+
+    public static void SetModelFromClass(this CCSPlayerPawn pawn)
+    {
+        Natives.CCSPlayerPawn_SetModelFromClass.Call(pawn.Address);
     }
 }
 

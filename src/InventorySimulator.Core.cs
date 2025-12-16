@@ -16,6 +16,24 @@ namespace InventorySimulator;
 
 public partial class InventorySimulator
 {
+    public void RegivePlayerAgent(
+        IPlayer player,
+        PlayerInventory inventory,
+        PlayerInventory oldInventory
+    )
+    {
+        var pawn = player.PlayerPawn;
+        if (pawn == null)
+            return;
+        var item = inventory.Agents.TryGetValue(player.Controller.TeamNum, out var a) ? a : null;
+        var oldItem = oldInventory.Agents.TryGetValue(player.Controller.TeamNum, out a) ? a : null;
+        if (oldItem == item)
+            return;
+        pawn.UpdateModelFromLoadout();
+        pawn.SetModelFromClass();
+        pawn.AcceptInput("SetBodygroup", "default_gloves,1");
+    }
+
     public void RegivePlayerGloves(
         IPlayer player,
         PlayerInventory inventory,
@@ -41,7 +59,8 @@ public partial class InventorySimulator
         Core.Scheduler.NextWorldUpdate(() =>
         {
             itemServices.UpdateWearables();
-            pawn.AcceptInput("SetBodygroup", "default_gloves,1");
+            if (item != null)
+                pawn.AcceptInput("SetBodygroup", "default_gloves,1");
         });
     }
 
@@ -215,8 +234,9 @@ public partial class InventorySimulator
         var inventory = GetPlayerInventory(player);
         if (IsWsImmediately.Value)
         {
-            RegivePlayerWeapons(player, inventory, oldInventory);
+            RegivePlayerAgent(player, inventory, oldInventory);
             RegivePlayerGloves(player, inventory, oldInventory);
+            RegivePlayerWeapons(player, inventory, oldInventory);
         }
     }
 
