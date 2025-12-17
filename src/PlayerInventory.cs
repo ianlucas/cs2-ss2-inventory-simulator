@@ -4,7 +4,6 @@
  *--------------------------------------------------------------------------------------------*/
 
 using System.Text.Json.Serialization;
-using CS2Lib.SwiftlyCS2.Core;
 using SwiftlyS2.Shared.Players;
 using SwiftlyS2.Shared.SchemaDefinitions;
 
@@ -310,8 +309,7 @@ public class PlayerInventory(
             knife.WearOverride = GetWeaponEconItemWear(knife);
             return knife;
         }
-        // TODO Refactor this castfest.
-        if (fallback && Knives.TryGetValue((byte)PlayerHelpers.ToggleTeam((Team)team), out knife))
+        if (fallback && Knives.TryGetValue(Utilities.ToggleTeam(team), out knife))
         {
             knife.WearOverride = GetWeaponEconItemWear(knife);
             return knife;
@@ -331,10 +329,7 @@ public class PlayerInventory(
             weapon.WearOverride = GetWeaponEconItemWear(weapon);
             return weapon;
         }
-        if (
-            fallback
-            && GetWeapons((byte)PlayerHelpers.ToggleTeam((Team)team)).TryGetValue(def, out weapon)
-        )
+        if (fallback && GetWeapons(Utilities.ToggleTeam(team)).TryGetValue(def, out weapon))
         {
             weapon.WearOverride = GetWeaponEconItemWear(weapon);
             return weapon;
@@ -348,7 +343,7 @@ public class PlayerInventory(
         {
             return glove;
         }
-        if (fallback && Gloves.TryGetValue((byte)PlayerHelpers.ToggleTeam((Team)team), out glove))
+        if (fallback && Gloves.TryGetValue(Utilities.ToggleTeam(team), out glove))
         {
             return glove;
         }

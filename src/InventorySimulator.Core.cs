@@ -4,8 +4,6 @@
  *--------------------------------------------------------------------------------------------*/
 
 using CS2Lib;
-using CS2Lib.SwiftlyCS2.Core;
-using CS2Lib.SwiftlyCS2.Extensions;
 using SwiftlyS2.Shared.Events;
 using SwiftlyS2.Shared.Natives;
 using SwiftlyS2.Shared.Players;
@@ -91,9 +89,10 @@ public partial class InventorySimulator
         if (item == null)
             return;
         item.Stattrak += 1;
+        var statTrak = Utilities.ViewAs<int, float>(item.Stattrak);
         weapon.AttributeManager.Item.NetworkedDynamicAttributes.SetOrAddAttribute(
             "kill eater",
-            UnsafeHelpers.ViewAs<int, float>(item.Stattrak)
+            statTrak
         );
         SendStatTrakIncrement(player.SteamID, item.Uid);
     }

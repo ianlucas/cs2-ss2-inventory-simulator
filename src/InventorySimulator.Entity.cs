@@ -4,8 +4,6 @@
  *--------------------------------------------------------------------------------------------*/
 
 using CS2Lib;
-using CS2Lib.SwiftlyCS2.Core;
-using CS2Lib.SwiftlyCS2.Extensions;
 using SwiftlyS2.Shared.Players;
 using SwiftlyS2.Shared.SchemaDefinitions;
 using SwiftlyS2.Shared.SteamAPI;
@@ -33,14 +31,14 @@ public partial class InventorySimulator
         attrs.SetOrAddAttribute("set item texture wear", wear);
         if (weaponItem.Stattrak >= 0)
         {
-            var statTrak = UnsafeHelpers.ViewAs<int, float>(weaponItem.Stattrak);
+            var statTrak = Utilities.ViewAs<int, float>(weaponItem.Stattrak);
             attrs.SetOrAddAttribute("kill eater", statTrak);
             attrs.SetOrAddAttribute("kill eater score type", 0);
         }
         if (!isKnife)
             foreach (var sticker in weaponItem.Stickers)
             {
-                var id = UnsafeHelpers.ViewAs<uint, float>(sticker.Def);
+                var id = Utilities.ViewAs<uint, float>(sticker.Def);
                 var slot = $"sticker slot {sticker.Slot}";
                 attrs.SetOrAddAttribute($"{slot} id", id);
                 attrs.SetOrAddAttribute($"{slot} wear", sticker.Wear);
@@ -94,12 +92,12 @@ public partial class InventorySimulator
             weapon.FallbackStatTrak = weaponItem.Stattrak;
             item.NetworkedDynamicAttributes.SetOrAddAttribute(
                 "kill eater",
-                UnsafeHelpers.ViewAs<int, float>(weaponItem.Stattrak)
+                Utilities.ViewAs<int, float>(weaponItem.Stattrak)
             );
             item.NetworkedDynamicAttributes.SetOrAddAttribute("kill eater score type", 0);
             item.AttributeList.SetOrAddAttribute(
                 "kill eater",
-                UnsafeHelpers.ViewAs<int, float>(weaponItem.Stattrak)
+                Utilities.ViewAs<int, float>(weaponItem.Stattrak)
             );
             item.AttributeList.SetOrAddAttribute("kill eater score type", 0);
         }
@@ -110,7 +108,7 @@ public partial class InventorySimulator
                 var slot = $"sticker slot {sticker.Slot}";
                 item.NetworkedDynamicAttributes.SetOrAddAttribute(
                     $"{slot} id",
-                    UnsafeHelpers.ViewAs<uint, float>(sticker.Def)
+                    Utilities.ViewAs<uint, float>(sticker.Def)
                 );
                 item.NetworkedDynamicAttributes.SetOrAddAttribute($"{slot} wear", sticker.Wear);
                 if (sticker.Rotation != null)
@@ -159,7 +157,7 @@ public partial class InventorySimulator
             if (patch != 0)
                 item.AttributeList.SetOrAddAttribute(
                     $"sticker slot {i} id",
-                    UnsafeHelpers.ViewAs<uint, float>(patch)
+                    Utilities.ViewAs<uint, float>(patch)
                 );
         }
     }
@@ -174,7 +172,7 @@ public partial class InventorySimulator
         item.NetworkedDynamicAttributes.Attributes.RemoveAll();
         item.NetworkedDynamicAttributes.SetOrAddAttribute(
             "music id",
-            UnsafeHelpers.ViewAs<int, float>(musicKitItem.Def)
+            Utilities.ViewAs<int, float>(musicKitItem.Def)
         );
     }
 
