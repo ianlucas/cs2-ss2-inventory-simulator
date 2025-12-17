@@ -307,11 +307,13 @@ public class PlayerInventory(
     {
         if (Knives.TryGetValue(team, out var knife))
         {
+            knife.WearOverride = GetWeaponEconItemWear(knife);
             return knife;
         }
         // TODO Refactor this castfest.
         if (fallback && Knives.TryGetValue((byte)PlayerHelpers.ToggleTeam((Team)team), out knife))
         {
+            knife.WearOverride = GetWeaponEconItemWear(knife);
             return knife;
         }
         return null;
@@ -326,6 +328,7 @@ public class PlayerInventory(
     {
         if (GetWeapons(team).TryGetValue(def, out var weapon))
         {
+            weapon.WearOverride = GetWeaponEconItemWear(weapon);
             return weapon;
         }
         if (
@@ -333,6 +336,7 @@ public class PlayerInventory(
             && GetWeapons((byte)PlayerHelpers.ToggleTeam((Team)team)).TryGetValue(def, out weapon)
         )
         {
+            weapon.WearOverride = GetWeaponEconItemWear(weapon);
             return weapon;
         }
         return null;

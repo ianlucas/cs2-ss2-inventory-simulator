@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------------------------
-*  Copyright (c) Ian Lucas. All rights reserved.
-*  Licensed under the MIT License. See License.txt in the project root for license information.
-*--------------------------------------------------------------------------------------------*/
+ *  Copyright (c) Ian Lucas. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
 
 using System.Runtime.InteropServices;
 using SwiftlyS2.Shared;
@@ -14,8 +14,6 @@ namespace InventorySimulator;
 public static class Natives
 {
     private static ISwiftlyCore? _core;
-
-    public const int CEconItemView_Size = 1024;
 
     public delegate nint CCSPlayer_ItemServices_GiveNamedItemDelegate(
         nint thisPtr,
@@ -207,7 +205,7 @@ public static class Natives
 
     public static nint CreateEconItemView(nint copyFrom = 0)
     {
-        var ptr = Marshal.AllocHGlobal(CEconItemView_Size);
+        var ptr = Marshal.AllocHGlobal(Helper.GetSchemaSize<CEconItemView>());
         CEconItemView_Constructor.Call(ptr);
         if (copyFrom != 0)
             CEconItemView_OperatorEquals.Call(ptr, copyFrom);
