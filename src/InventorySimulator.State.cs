@@ -24,9 +24,8 @@ public partial class InventorySimulator
 
     public readonly PlayerInventory EmptyInventory = new();
 
-    private static readonly string[] TeamSelectSuffixes = ["counterterrorist", "terrorist"];
     public static readonly string InventoryFileDir = "csgo/addons/swiftlycs2/configs";
-    public static readonly ulong MinimumCustomItemID = 45155030971;
+    public static readonly ulong MinimumCustomItemID = 65155030971;
     public static readonly bool IsWindows = OperatingSystem.IsWindows();
 
     public ulong NextItemId = MinimumCustomItemID;

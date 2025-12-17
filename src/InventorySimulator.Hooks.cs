@@ -43,25 +43,52 @@ public partial class InventorySimulator
         return (thisPtr, pchName, a3, pScriptItem, a5, a6) =>
         {
             var designerName = Marshal.PtrToStringUTF8(pchName);
-            if (
-                designerName != null
-                && pScriptItem == nint.Zero
-                && CS2Items.IsMeleeDesignerName(designerName)
-            )
+            var isKnife = designerName != null && CS2Items.IsMeleeDesignerName(designerName);
+            if (isKnife && pScriptItem == nint.Zero)
+            {
+                var itemServices = Core.Memory.ToSchemaClass<CCSPlayer_ItemServices>(thisPtr);
+                var controller = itemServices.GetController();
+
+                if (controller?.SteamID != 0 && controller?.InventoryServices != null)
+                {
+                    controller.InventoryServices.ServerAuthoritativeWeaponSlots.RemoveAll();
+                    controller.InventoryServices.ServerAuthoritativeWeaponSlotsUpdated();
+                    if (isKnife)
+                    {
+                        var inventory = controller.InventoryServices.GetInventory();
+                        if (inventory.IsValid)
+                            pScriptItem = inventory.GetItemInLoadout(
+                                controller.TeamNum,
+                                loadout_slot_t.LOADOUT_SLOT_MELEE
+                            );
+                    }
+                }
+            }
+            var ret = next()(thisPtr, pchName, a3, pScriptItem, a5, a6);
+            var weapon = Core.Memory.ToSchemaClass<CBasePlayerWeapon>(ret);
+            if (!isKnife && !IsCustomWeaponItemID(weapon))
             {
                 var itemServices = Core.Memory.ToSchemaClass<CCSPlayer_ItemServices>(thisPtr);
                 var controller = itemServices.GetController();
                 if (controller?.SteamID != 0 && controller?.InventoryServices?.IsValid == true)
                 {
-                    var inventory = controller.InventoryServices.GetInventory();
-                    if (inventory.IsValid)
-                        pScriptItem = inventory.GetItemInLoadout(
-                            controller.TeamNum,
-                            (int)loadout_slot_t.LOADOUT_SLOT_MELEE
+                    var inventory = GetPlayerInventoryBySteamID(controller.SteamID);
+                    var item = inventory.GetWeapon(
+                        controller.TeamNum,
+                        weapon.AttributeManager.Item.ItemDefinitionIndex,
+                        IsFallbackTeam.Value
+                    );
+                    if (item != null)
+                    {
+                        ApplyWeaponAttributesFromItem(
+                            weapon.AttributeManager.Item,
+                            item,
+                            weapon,
+                            controller
                         );
+                    }
                 }
             }
-            var ret = next()(thisPtr, pchName, a3, pScriptItem, a5, a6);
             return ret;
         };
     }
