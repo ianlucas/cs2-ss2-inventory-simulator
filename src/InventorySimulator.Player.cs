@@ -3,6 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using SwiftlyS2.Shared.Players;
@@ -61,7 +62,7 @@ public partial class InventorySimulator
             .ToList();
         foreach (var key in keysToRemove)
             if (CreatedEconItemViewPointers.TryRemove(key, out var ptr))
-                Natives.FreeMemory(ptr);
+                Marshal.FreeHGlobal(ptr);
     }
 
     public void UpdatePlayerControllerSteamID(IPlayer player)

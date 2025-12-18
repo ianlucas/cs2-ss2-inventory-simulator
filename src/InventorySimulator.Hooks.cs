@@ -126,7 +126,7 @@ public partial class InventorySimulator
                 ApplyAttributesFromWrapper(existingItem, itemWrapper, inventory, steamId);
                 return existingPtr;
             }
-            var newItemPtr = Natives.CreateEconItemView(copyFrom: ret);
+            var newItemPtr = EconItemHelper.CreateCEconItemView(copyFrom: ret);
             var item = Core.Memory.ToSchemaClass<CEconItemView>(newItemPtr);
             ApplyAttributesFromWrapper(item, itemWrapper, inventory, steamId);
             CreatedEconItemViewPointers[key] = newItemPtr;
