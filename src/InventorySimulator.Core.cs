@@ -89,7 +89,7 @@ public partial class InventorySimulator
         if (item == null)
             return;
         item.Stattrak += 1;
-        var statTrak = Utilities.ViewAs<int, float>(item.Stattrak);
+        var statTrak = TypeConverter.ViewAs<int, float>(item.Stattrak);
         weapon.AttributeManager.Item.NetworkedDynamicAttributes.SetOrAddAttribute(
             "kill eater",
             statTrak
@@ -267,7 +267,7 @@ public partial class InventorySimulator
         if (movementServices == null)
             return;
         var trace = stackalloc CGameTrace[1];
-        if (!pawn.IsAbleToApplySpray((nint)trace) || (IntPtr)trace == IntPtr.Zero)
+        if (!pawn.IsAbleToApplySpray((nint)trace) || (nint)trace == nint.Zero)
             return;
         SprayCanShakeSound.Recipients.AddRecipient(player.PlayerID);
         SprayCanShakeSound.Emit();
