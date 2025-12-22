@@ -20,6 +20,7 @@ public class SignInUserResponse
 
 public class InventorySimulatorApi
 {
+    private static readonly HttpClient _httpClient = new();
     private static ILogger? _logger;
     private static IConVar<string>? _url;
 
@@ -39,30 +40,30 @@ public class InventorySimulatorApi
     public static async Task<PlayerInventory?> FetchPlayerInventory(ulong steamId)
     {
         var url = GetAPIUrl($"/api/equipped/v3/{steamId}.json");
-        for (var attempt = 0; attempt < 3; attempt++)
-        {
+        for (var attempt = 1; attempt <= 3; attempt++)
             try
             {
-                try
-                {
-                    using HttpClient client = new();
-                    var response = await client.GetAsync(url);
-                    response.EnsureSuccessStatusCode();
-                    string jsonContent = response.Content.ReadAsStringAsync().Result;
-                    return JsonSerializer.Deserialize<PlayerInventory>(jsonContent);
-                }
-                catch (Exception error)
-                {
-                    _logger?.LogError("GET {Url} failed: {Message}", url, error.Message);
-                    throw;
-                }
+                var response = await _httpClient.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+                var jsonContent = await response.Content.ReadAsStringAsync();
+                return JsonSerializer.Deserialize<PlayerInventory>(jsonContent);
             }
-            catch { }
-        }
+            catch (Exception error)
+            {
+                _logger?.LogError(
+                    "GET {Url} failed (attempt {Attempt}/3): {Message}",
+                    url,
+                    attempt,
+                    error.Message
+                );
+                if (attempt == 3)
+                    return null;
+                await Task.Delay(TimeSpan.FromMilliseconds(100 * attempt));
+            }
         return null;
     }
 
-    public static async Task SendStatTrakIncrement(string apiKey, int targetUid, string userId)
+    public static async void SendStatTrakIncrement(string apiKey, int targetUid, string userId)
     {
         var url = GetAPIUrl("/api/increment-item-stattrak");
         try
@@ -76,21 +77,18 @@ public class InventorySimulatorApi
                 }
             );
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-            using HttpClient client = new();
-            var response = await client.PostAsync(url, content);
+            var response = await _httpClient.PostAsync(url, content);
             if (response.StatusCode == HttpStatusCode.Unauthorized)
             {
                 _logger?.LogError("POST {Url} failed, check your invsim_apikey's value.", url);
                 return;
             }
             if (!response.IsSuccessStatusCode)
-            {
                 _logger?.LogError(
                     "POST {Url} failed with status code: {StatusCode}",
                     url,
                     response.StatusCode
                 );
-            }
         }
         catch (Exception error)
         {
@@ -105,8 +103,7 @@ public class InventorySimulatorApi
         {
             var json = JsonSerializer.Serialize(new { apiKey, userId });
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-            using HttpClient client = new();
-            var response = await client.PostAsync(url, content);
+            var response = await _httpClient.PostAsync(url, content);
             if (response.StatusCode == HttpStatusCode.Unauthorized)
             {
                 _logger?.LogError("POST {Url} failed, check your invsim_apikey's value.", url);
