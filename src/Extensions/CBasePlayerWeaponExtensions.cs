@@ -15,4 +15,9 @@ public static class CBasePlayerWeaponExtensions
         var designerName = weapon.AttributeManager.Item.GetDesignerName() ?? weapon.DesignerName;
         return CS2Items.IsMeleeDesignerName(designerName) ? "weapon_knife" : designerName;
     }
+
+    public static bool HasCustomItemID(this CBasePlayerWeapon weapon)
+    {
+        return weapon.AttributeManager.Item.ItemID >= CEconItemViewExtensions.MinimumCustomItemID;
+    }
 }

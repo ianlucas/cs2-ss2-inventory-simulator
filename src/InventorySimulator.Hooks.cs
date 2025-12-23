@@ -67,7 +67,7 @@ public partial class InventorySimulator
             }
             var ret = next()(thisPtr, pchName, a3, pScriptItem, a5, a6);
             var weapon = Core.Memory.ToSchemaClass<CBasePlayerWeapon>(ret);
-            if (!isKnife && !IsCustomWeaponItemID(weapon))
+            if (!isKnife && !weapon.HasCustomItemID())
             {
                 var itemServices = Core.Memory.ToSchemaClass<CCSPlayer_ItemServices>(thisPtr);
                 var controller = itemServices.GetController();
@@ -80,14 +80,7 @@ public partial class InventorySimulator
                         IsFallbackTeam.Value
                     );
                     if (item != null)
-                    {
-                        ApplyWeaponAttributesFromItem(
-                            weapon.AttributeManager.Item,
-                            item,
-                            weapon,
-                            controller
-                        );
-                    }
+                        weapon.AttributeManager.Item.ApplyAttributes(item, weapon, controller);
                 }
             }
             return ret;
@@ -124,12 +117,12 @@ public partial class InventorySimulator
             if (CreatedCEconItemViewManager.TryGetValue(key, out var existingPtr))
             {
                 var existingItem = Core.Memory.ToSchemaClass<CEconItemView>(existingPtr);
-                ApplyAttributesFromInventoryItem(existingItem, inventoryItem, steamId);
+                existingItem.ApplyAttributes(inventoryItem, steamId);
                 return existingPtr;
             }
             var newItemPtr = EconItemHelper.CreateCEconItemView(copyFrom: ret);
             var item = Core.Memory.ToSchemaClass<CEconItemView>(newItemPtr);
-            ApplyAttributesFromInventoryItem(item, inventoryItem, steamId);
+            item.ApplyAttributes(inventoryItem, steamId);
             CreatedCEconItemViewManager[key] = newItemPtr;
             return newItemPtr;
         };

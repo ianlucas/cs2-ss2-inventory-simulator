@@ -71,7 +71,7 @@ public partial class InventorySimulator
         var weapon = player.PlayerPawn?.WeaponServices?.ActiveWeapon.Value;
         if (
             weapon == null
-            || !IsCustomWeaponItemID(weapon)
+            || !weapon.HasCustomItemID()
             || weapon.AttributeManager.Item.AccountID
                 != new CSteamID(player.SteamID).GetAccountID().m_AccountID
             || weapon.AttributeManager.Item.ItemID != ulong.Parse(weaponItemId)
@@ -299,7 +299,7 @@ public partial class InventorySimulator
             && player.PlayerPawn?.IsAbleToApplySpray() == true
         )
         {
-            if (IsPlayerUseCmdBusy(player))
+            if (player.IsUseCmdBusy())
                 PlayerUseCmdBlockManager[player.SteamID] = true;
             if (PlayerUseCmdManager.TryGetValue(player.SteamID, out var timer))
             {
@@ -312,7 +312,7 @@ public partial class InventorySimulator
                 {
                     if (PlayerUseCmdBlockManager.ContainsKey(player.SteamID))
                         PlayerUseCmdBlockManager.Remove(player.SteamID, out var _);
-                    else if (player.IsValid && !IsPlayerUseCmdBusy(player))
+                    else if (player.IsValid && !player.IsUseCmdBusy())
                         player.ExecuteCommand("css_spray");
                 }
             );
