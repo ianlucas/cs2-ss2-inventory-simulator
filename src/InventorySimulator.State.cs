@@ -25,7 +25,6 @@ public partial class InventorySimulator
 
     public static readonly string InventoryFileDir = "csgo/addons/swiftlycs2/configs";
     public static readonly ulong MinimumCustomItemID = 65155030971;
-    public static readonly bool IsWindows = OperatingSystem.IsWindows();
 
     public ulong NextItemId = MinimumCustomItemID;
     public Guid? OnActivatePlayerHookGuid = null;
