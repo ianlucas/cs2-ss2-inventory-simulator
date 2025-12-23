@@ -6,19 +6,12 @@
 using System.Net;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
 using SwiftlyS2.Shared.Convars;
 
-namespace InventorySimulator.Services;
+namespace InventorySimulator;
 
-public class SignInUserResponse
-{
-    [JsonPropertyName("token")]
-    public required string Token { get; set; }
-}
-
-public class InventorySimulatorApi
+public class Api
 {
     private static readonly HttpClient _httpClient = new();
     private static ILogger? _logger;
@@ -30,7 +23,7 @@ public class InventorySimulatorApi
         _url = url;
     }
 
-    public static string GetAPIUrl(string pathname = "")
+    public static string GetUrl(string pathname = "")
     {
         if (_url == null)
             throw new InvalidOperationException("API not initialized. Call Initialize() first.");
@@ -39,7 +32,7 @@ public class InventorySimulatorApi
 
     public static async Task<PlayerInventory?> FetchPlayerInventory(ulong steamId)
     {
-        var url = GetAPIUrl($"/api/equipped/v3/{steamId}.json");
+        var url = GetUrl($"/api/equipped/v3/{steamId}.json");
         for (var attempt = 1; attempt <= 3; attempt++)
             try
             {
@@ -63,19 +56,18 @@ public class InventorySimulatorApi
         return null;
     }
 
-    public static async void SendStatTrakIncrement(string apiKey, int targetUid, string userId)
+    public static async Task SendStatTrakIncrement(string apiKey, int targetUid, string userId)
     {
-        var url = GetAPIUrl("/api/increment-item-stattrak");
+        var url = GetUrl("/api/increment-item-stattrak");
         try
         {
-            var json = JsonSerializer.Serialize(
-                new
-                {
-                    apiKey,
-                    targetUid,
-                    userId,
-                }
-            );
+            var request = new StatTrakIncrementRequest
+            {
+                ApiKey = apiKey,
+                TargetUid = targetUid,
+                UserId = userId,
+            };
+            var json = JsonSerializer.Serialize(request);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await _httpClient.PostAsync(url, content);
             if (response.StatusCode == HttpStatusCode.Unauthorized)
@@ -98,10 +90,11 @@ public class InventorySimulatorApi
 
     public static async Task<SignInUserResponse?> SendSignIn(string apiKey, string userId)
     {
-        var url = GetAPIUrl("/api/sign-in");
+        var url = GetUrl("/api/sign-in");
         try
         {
-            var json = JsonSerializer.Serialize(new { apiKey, userId });
+            var request = new SignInRequest { ApiKey = apiKey, UserId = userId };
+            var json = JsonSerializer.Serialize(request);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await _httpClient.PostAsync(url, content);
             if (response.StatusCode == HttpStatusCode.Unauthorized)

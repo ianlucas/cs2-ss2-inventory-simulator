@@ -3,7 +3,6 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-using InventorySimulator.Services;
 using SwiftlyS2.Shared.Players;
 
 namespace InventorySimulator;
@@ -18,23 +17,14 @@ public partial class InventorySimulator
         if (FetchingPlayerInventory.ContainsKey(steamId))
             return;
         FetchingPlayerInventory.TryAdd(steamId, true);
-        for (var attempt = 0; attempt < 3; attempt++)
-            try
-            {
-                var inventory = await InventorySimulatorApi.FetchPlayerInventory(steamId);
-                if (inventory != null)
-                {
-                    if (existing != null)
-                        inventory.CachedWeaponEconItems = existing.CachedWeaponEconItems;
-                    PlayerCooldownManager[steamId] = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-                    AddPlayerInventory(steamId, inventory);
-                }
-                break;
-            }
-            catch
-            {
-                // Try again to fetch data (up to 3 times).
-            }
+        var inventory = await Api.FetchPlayerInventory(steamId);
+        if (inventory != null)
+        {
+            if (existing != null)
+                inventory.CachedWeaponEconItems = existing.CachedWeaponEconItems;
+            PlayerCooldownManager[steamId] = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            AddPlayerInventory(steamId, inventory);
+        }
         FetchingPlayerInventory.Remove(steamId, out var _);
         if (PlayerInventoryPostFetchHandlers.TryGetValue(steamId, out var callback))
         {
@@ -72,11 +62,7 @@ public partial class InventorySimulator
     {
         if (ApiKey.Value == "")
             return;
-        await InventorySimulatorApi.SendStatTrakIncrement(
-            ApiKey.Value,
-            targetUid,
-            userId.ToString()
-        );
+        await Api.SendStatTrakIncrement(ApiKey.Value, targetUid, userId.ToString());
     }
 
     public async void SendSignIn(ulong userId)
@@ -84,7 +70,7 @@ public partial class InventorySimulator
         if (AuthenticatingPlayer.ContainsKey(userId))
             return;
         AuthenticatingPlayer.TryAdd(userId, true);
-        var response = await InventorySimulatorApi.SendSignIn(ApiKey.Value, userId.ToString());
+        var response = await Api.SendSignIn(ApiKey.Value, userId.ToString());
         AuthenticatingPlayer.TryRemove(userId, out var _);
         Core.Scheduler.NextWorldUpdate(() =>
         {
@@ -97,7 +83,7 @@ public partial class InventorySimulator
             player?.SendChat(
                 Core.Localizer[
                     "invsim.login",
-                    $"{InventorySimulatorApi.GetAPIUrl("/api/sign-in/callback")}?token={response.Token}"
+                    $"{Api.GetUrl("/api/sign-in/callback")}?token={response.Token}"
                 ]
             );
         });
