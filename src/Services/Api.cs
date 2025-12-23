@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
+using SwiftlyS2.Shared;
 using SwiftlyS2.Shared.Convars;
 
 namespace InventorySimulator;
@@ -19,11 +20,17 @@ public class Api
     private static readonly HttpClient _httpClient = new();
     private static ILogger? _logger;
     private static IConVar<string>? _url;
+    private static IConVar<string>? _apiKey;
 
-    public static void Initialize(ILogger logger, IConVar<string> url)
+    private static string ApiKey =>
+        _apiKey?.Value
+        ?? throw new InvalidOperationException("API not initialized. Call Initialize() first.");
+
+    public static void Initialize(ISwiftlyCore core, IConVar<string> url, IConVar<string> apiKey)
     {
-        _logger = logger;
+        _logger = core.Logger;
         _url = url;
+        _apiKey = apiKey;
         _httpClient.Timeout = TimeSpan.FromSeconds(30);
     }
 
@@ -32,6 +39,11 @@ public class Api
         if (_url == null)
             throw new InvalidOperationException("API not initialized. Call Initialize() first.");
         return $"{_url.Value}{pathname}";
+    }
+
+    public static bool HasApiKey()
+    {
+        return ApiKey != "";
     }
 
     private static async Task<HttpResponseMessage?> SendPostRequest(string url, object request)
@@ -107,22 +119,22 @@ public class Api
         return null;
     }
 
-    public static async Task SendStatTrakIncrement(string apiKey, int targetUid, string userId)
+    public static async Task SendStatTrakIncrement(int targetUid, string userId)
     {
         var url = GetUrl("/api/increment-item-stattrak");
         var request = new StatTrakIncrementRequest
         {
-            ApiKey = apiKey,
+            ApiKey = ApiKey,
             TargetUid = targetUid,
             UserId = userId,
         };
         await PostAsync(url, request);
     }
 
-    public static async Task<SignInUserResponse?> SendSignIn(string apiKey, string userId)
+    public static async Task<SignInUserResponse?> SendSignIn(string userId)
     {
         var url = GetUrl("/api/sign-in");
-        var request = new SignInRequest { ApiKey = apiKey, UserId = userId };
+        var request = new SignInRequest { ApiKey = ApiKey, UserId = userId };
         return await PostAsync<SignInUserResponse>(url, request);
     }
 }

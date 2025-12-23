@@ -61,9 +61,8 @@ public partial class InventorySimulator
 
     public async void SendStatTrakIncrement(ulong userId, int targetUid)
     {
-        if (ApiKey.Value == "")
-            return;
-        await Api.SendStatTrakIncrement(ApiKey.Value, targetUid, userId.ToString());
+        if (Api.HasApiKey())
+            await Api.SendStatTrakIncrement(targetUid, userId.ToString());
     }
 
     public async void SendSignIn(ulong userId)
@@ -71,7 +70,7 @@ public partial class InventorySimulator
         if (AuthenticatingPlayer.ContainsKey(userId))
             return;
         AuthenticatingPlayer.TryAdd(userId, true);
-        var response = await Api.SendSignIn(ApiKey.Value, userId.ToString());
+        var response = await Api.SendSignIn(userId.ToString());
         AuthenticatingPlayer.TryRemove(userId, out var _);
         Core.Scheduler.NextWorldUpdate(() =>
         {
