@@ -3,47 +3,28 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-using System.Text.Json.Serialization;
 using SwiftlyS2.Shared.Players;
 using SwiftlyS2.Shared.SchemaDefinitions;
 
 namespace InventorySimulator;
 
-[method: JsonConstructor]
-public class PlayerInventory(
-    Dictionary<byte, WeaponEconItem>? knives = null,
-    Dictionary<byte, BaseEconItem>? gloves = null,
-    Dictionary<ushort, WeaponEconItem>? tWeapons = null,
-    Dictionary<ushort, WeaponEconItem>? ctWeapons = null,
-    Dictionary<byte, AgentItem>? agents = null,
-    uint? pin = null,
-    MusicKitItem? musicKit = null,
-    GraffitiItem? graffiti = null
-)
+public class PlayerInventory
 {
-    [JsonPropertyName("knives")]
-    public Dictionary<byte, WeaponEconItem> Knives { get; set; } = knives ?? [];
+    private readonly EquippedV3Response _data;
 
-    [JsonPropertyName("gloves")]
-    public Dictionary<byte, BaseEconItem> Gloves { get; set; } = gloves ?? [];
+    public PlayerInventory(EquippedV3Response data)
+    {
+        _data = data;
+    }
 
-    [JsonPropertyName("tWeapons")]
-    public Dictionary<ushort, WeaponEconItem> TWeapons { get; set; } = tWeapons ?? [];
-
-    [JsonPropertyName("ctWeapons")]
-    public Dictionary<ushort, WeaponEconItem> CTWeapons { get; set; } = ctWeapons ?? [];
-
-    [JsonPropertyName("agents")]
-    public Dictionary<byte, AgentItem> Agents { get; set; } = agents ?? [];
-
-    [JsonPropertyName("pin")]
-    public uint? Pin { get; set; } = pin;
-
-    [JsonPropertyName("musicKit")]
-    public MusicKitItem? MusicKit { get; set; } = musicKit;
-
-    [JsonPropertyName("graffiti")]
-    public GraffitiItem? Graffiti { get; set; } = graffiti;
+    public Dictionary<byte, WeaponEconItem> Knives => _data.Knives;
+    public Dictionary<byte, BaseEconItem> Gloves => _data.Gloves;
+    public Dictionary<ushort, WeaponEconItem> TWeapons => _data.TWeapons;
+    public Dictionary<ushort, WeaponEconItem> CTWeapons => _data.CTWeapons;
+    public Dictionary<byte, AgentItem> Agents => _data.Agents;
+    public uint? Pin => _data.Pin;
+    public MusicKitItem? MusicKit => _data.MusicKit;
+    public GraffitiItem? Graffiti => _data.Graffiti;
 
     public WeaponEconItem? GetKnife(byte team, bool fallback)
     {

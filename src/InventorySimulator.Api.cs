@@ -17,9 +17,10 @@ public partial class InventorySimulator
         if (FetchingPlayerInventory.ContainsKey(steamId))
             return;
         FetchingPlayerInventory.TryAdd(steamId, true);
-        var inventory = await Api.FetchPlayerInventory(steamId);
-        if (inventory != null)
+        var response = await Api.FetchEquipped(steamId);
+        if (response != null)
         {
+            var inventory = new PlayerInventory(response);
             if (existing != null)
                 inventory.CachedWeaponEconItems = existing.CachedWeaponEconItems;
             PlayerCooldownManager[steamId] = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
