@@ -94,7 +94,7 @@ public class PlayerInventory
         }
     }
 
-    public InventoryItemWrapper GetItemForSlot(
+    public PlayerInventoryItem? GetItemForSlot(
         loadout_slot_t slot,
         byte team,
         ushort? def,
@@ -112,39 +112,27 @@ public class PlayerInventory
                 isKnife ? GetKnife(team, fallback)
                 : def.HasValue ? GetWeapon(team, def.Value, fallback)
                 : null;
-            return weaponItem != null
-                ? InventoryItemWrapper.FromWeapon(weaponItem)
-                : InventoryItemWrapper.Empty();
+            return weaponItem != null ? PlayerInventoryItem.FromWeapon(weaponItem) : null;
         }
         if (slot == loadout_slot_t.LOADOUT_SLOT_CLOTHING_CUSTOMPLAYER)
         {
             if (minModels > 0)
                 return team == (byte)Team.T
-                    ? InventoryItemWrapper.FromAgent(new AgentItem { Def = 5036 })
-                    : InventoryItemWrapper.FromAgent(new AgentItem { Def = 5037 });
+                    ? PlayerInventoryItem.FromAgent(new AgentItem { Def = 5036 })
+                    : PlayerInventoryItem.FromAgent(new AgentItem { Def = 5037 });
             if (_data.Agents.TryGetValue(team, out var agentItem) && agentItem.Def != null)
-                return InventoryItemWrapper.FromAgent(agentItem);
-            return InventoryItemWrapper.Empty();
+                return PlayerInventoryItem.FromAgent(agentItem);
+            return null;
         }
         if (slot == loadout_slot_t.LOADOUT_SLOT_CLOTHING_HANDS)
         {
             var gloveItem = GetGloves(team, fallback);
-            return gloveItem != null
-                ? InventoryItemWrapper.FromGlove(gloveItem)
-                : InventoryItemWrapper.Empty();
+            return gloveItem != null ? PlayerInventoryItem.FromGlove(gloveItem) : null;
         }
         if (slot == loadout_slot_t.LOADOUT_SLOT_FLAIR0)
-        {
-            return _data.Pin.HasValue
-                ? InventoryItemWrapper.FromPin(_data.Pin.Value)
-                : InventoryItemWrapper.Empty();
-        }
+            return _data.Pin.HasValue ? PlayerInventoryItem.FromPin(_data.Pin.Value) : null;
         if (slot == loadout_slot_t.LOADOUT_SLOT_MUSICKIT)
-        {
-            return _data.MusicKit != null
-                ? InventoryItemWrapper.FromMusicKit(_data.MusicKit)
-                : InventoryItemWrapper.Empty();
-        }
-        return InventoryItemWrapper.Empty();
+            return _data.MusicKit != null ? PlayerInventoryItem.FromMusicKit(_data.MusicKit) : null;
+        return null;
     }
 }

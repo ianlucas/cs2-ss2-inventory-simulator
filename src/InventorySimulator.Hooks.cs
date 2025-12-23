@@ -117,18 +117,18 @@ public partial class InventorySimulator
                 isFallbackTeam,
                 MinModels.Value
             );
-            if (!itemWrapper.HasItem)
+            if (itemWrapper == null)
                 return ret;
             var key = $"{steamId}_{team}_{slot}";
             if (CreatedEconItemViewPointers.TryGetValue(key, out var existingPtr))
             {
                 var existingItem = Core.Memory.ToSchemaClass<CEconItemView>(existingPtr);
-                ApplyAttributesFromWrapper(existingItem, itemWrapper, inventory, steamId);
+                ApplyAttributesFromInventoryItem(existingItem, itemWrapper, steamId);
                 return existingPtr;
             }
             var newItemPtr = EconItemHelper.CreateCEconItemView(copyFrom: ret);
             var item = Core.Memory.ToSchemaClass<CEconItemView>(newItemPtr);
-            ApplyAttributesFromWrapper(item, itemWrapper, inventory, steamId);
+            ApplyAttributesFromInventoryItem(item, itemWrapper, steamId);
             CreatedEconItemViewPointers[key] = newItemPtr;
             return newItemPtr;
         };

@@ -176,10 +176,9 @@ public partial class InventorySimulator
         );
     }
 
-    public void ApplyAttributesFromWrapper(
+    public void ApplyAttributesFromInventoryItem(
         CEconItemView item,
-        InventoryItemWrapper wrapper,
-        PlayerInventory inventory,
+        PlayerInventoryItem wrapper,
         ulong steamId
     )
     {
