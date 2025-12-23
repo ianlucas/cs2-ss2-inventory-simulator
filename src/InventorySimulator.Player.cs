@@ -25,10 +25,10 @@ public partial class InventorySimulator
             var inventories = JsonSerializer.Deserialize<Dictionary<ulong, PlayerInventory>>(json);
             if (inventories != null)
             {
-                LoadedPlayerInventory.Clear();
+                LoadedInventoryManager.Clear();
                 foreach (var pair in inventories)
                 {
-                    LoadedPlayerInventory.TryAdd(pair.Key, true);
+                    LoadedInventoryManager.TryAdd(pair.Key, true);
                     AddPlayerInventory(pair.Key, pair.Value);
                 }
             }
@@ -46,7 +46,7 @@ public partial class InventorySimulator
 
     public void ClearPlayerInventory(ulong steamId)
     {
-        if (!LoadedPlayerInventory.ContainsKey(steamId))
+        if (!LoadedInventoryManager.ContainsKey(steamId))
         {
             PlayerInventoryManager.Remove(steamId, out _);
             PlayerCooldownManager.Remove(steamId, out _);
@@ -57,17 +57,17 @@ public partial class InventorySimulator
     public void ClearPlayerEconItemViewPointers(ulong steamId)
     {
         var prefix = $"{steamId}_";
-        var keysToRemove = CreatedEconItemViewPointers
+        var keysToRemove = CreatedCEconItemViewManager
             .Keys.Where(key => key.StartsWith(prefix))
             .ToList();
         foreach (var key in keysToRemove)
-            if (CreatedEconItemViewPointers.TryRemove(key, out var ptr))
+            if (CreatedCEconItemViewManager.TryRemove(key, out var ptr))
                 Marshal.FreeHGlobal(ptr);
     }
 
     public void ClearAllPlayerEconItemViewPointers()
     {
-        foreach (var ptr in CreatedEconItemViewPointers.Values)
+        foreach (var ptr in CreatedCEconItemViewManager.Values)
             Marshal.FreeHGlobal(ptr);
     }
 
@@ -116,7 +116,7 @@ public partial class InventorySimulator
 
     public void ClearPlayerInventoryPostFetchHandler(ulong steamId)
     {
-        PlayerInventoryPostFetchHandlers.TryRemove(steamId, out _);
+        PlayerPostFetchManager.TryRemove(steamId, out _);
     }
 
     public PlayerInventory GetPlayerInventory(IPlayer player)

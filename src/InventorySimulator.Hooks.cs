@@ -23,13 +23,13 @@ public partial class InventorySimulator
             if (player != null && !player.IsFakeClient && player.Controller != null)
                 if (!PlayerInventoryManager.ContainsKey(player.SteamID))
                 {
-                    PlayerInventoryPostFetchHandlers[player.SteamID] = () =>
+                    PlayerPostFetchManager[player.SteamID] = () =>
                         Core.Scheduler.NextWorldUpdate(() =>
                         {
                             if (player.Controller.IsValid)
                                 Natives.CServerSideClientBase_ActivatePlayer.CallOriginal(thisPtr);
                         });
-                    if (!FetchingPlayerInventory.ContainsKey(player.SteamID))
+                    if (!PlayerInFetchManager.ContainsKey(player.SteamID))
                         RefreshPlayerInventory(player);
                     return;
                 }
@@ -121,7 +121,7 @@ public partial class InventorySimulator
             if (inventoryItem == null)
                 return ret;
             var key = $"{steamId}_{team}_{slot}";
-            if (CreatedEconItemViewPointers.TryGetValue(key, out var existingPtr))
+            if (CreatedCEconItemViewManager.TryGetValue(key, out var existingPtr))
             {
                 var existingItem = Core.Memory.ToSchemaClass<CEconItemView>(existingPtr);
                 ApplyAttributesFromInventoryItem(existingItem, inventoryItem, steamId);
@@ -130,7 +130,7 @@ public partial class InventorySimulator
             var newItemPtr = EconItemHelper.CreateCEconItemView(copyFrom: ret);
             var item = Core.Memory.ToSchemaClass<CEconItemView>(newItemPtr);
             ApplyAttributesFromInventoryItem(item, inventoryItem, steamId);
-            CreatedEconItemViewPointers[key] = newItemPtr;
+            CreatedCEconItemViewManager[key] = newItemPtr;
             return newItemPtr;
         };
     }

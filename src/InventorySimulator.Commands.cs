@@ -27,7 +27,7 @@ public partial class InventorySimulator
                 return;
             }
         }
-        if (FetchingPlayerInventory.ContainsKey(player.SteamID))
+        if (PlayerInFetchManager.ContainsKey(player.SteamID))
         {
             player.SendChat(Core.Localizer["invsim.ws_in_progress"]);
             return;
@@ -63,7 +63,7 @@ public partial class InventorySimulator
         if (IsWsLogin.Value && Api.HasApiKey() && player != null)
         {
             player.SendChat(Core.Localizer["invsim.login_in_progress"]);
-            if (AuthenticatingPlayer.ContainsKey(player.SteamID))
+            if (PlayerInAuthManager.ContainsKey(player.SteamID))
                 return;
             SendSignIn(player.SteamID);
         }
