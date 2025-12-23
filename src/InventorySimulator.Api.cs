@@ -14,9 +14,9 @@ public partial class InventorySimulator
         var existing = PlayerInventoryManager.TryGetValue(steamId, out var i) ? i : null;
         if (!force && existing != null)
             return;
-        if (FetchingPlayerInventory.ContainsKey(steamId))
+        if (PlayerInFetchManager.ContainsKey(steamId))
             return;
-        FetchingPlayerInventory.TryAdd(steamId, true);
+        PlayerInFetchManager.TryAdd(steamId, true);
         var response = await Api.FetchEquipped(steamId);
         if (response != null)
         {
@@ -26,11 +26,11 @@ public partial class InventorySimulator
             PlayerCooldownManager[steamId] = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             AddPlayerInventory(steamId, inventory);
         }
-        FetchingPlayerInventory.Remove(steamId, out var _);
-        if (PlayerInventoryPostFetchHandlers.TryGetValue(steamId, out var callback))
+        PlayerInFetchManager.Remove(steamId, out var _);
+        if (PlayerPostFetchManager.TryGetValue(steamId, out var callback))
         {
             callback();
-            PlayerInventoryPostFetchHandlers.TryRemove(steamId, out _);
+            PlayerPostFetchManager.TryRemove(steamId, out _);
         }
     }
 
@@ -67,11 +67,11 @@ public partial class InventorySimulator
 
     public async void SendSignIn(ulong userId)
     {
-        if (AuthenticatingPlayer.ContainsKey(userId))
+        if (PlayerInAuthManager.ContainsKey(userId))
             return;
-        AuthenticatingPlayer.TryAdd(userId, true);
+        PlayerInAuthManager.TryAdd(userId, true);
         var response = await Api.SendSignIn(userId.ToString());
-        AuthenticatingPlayer.TryRemove(userId, out var _);
+        PlayerInAuthManager.TryRemove(userId, out var _);
         Core.Scheduler.NextWorldUpdate(() =>
         {
             var player = Core.PlayerManager.GetPlayerFromSteamID(userId);
