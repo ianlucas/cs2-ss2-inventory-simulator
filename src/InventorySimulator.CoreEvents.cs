@@ -27,28 +27,20 @@ public partial class InventorySimulator
     {
         var entity = @event.Entity;
         var designerName = entity.DesignerName;
-        if (designerName == "player_spray_decal")
+        if (designerName.Contains("weapon"))
         {
-            if (!IsSprayChangerEnabled.Value)
-                return;
-            Core.Scheduler.NextWorldUpdate(() =>
+            Core.Scheduler.NextTick(() =>
             {
-                var sprayDecal = entity.As<CPlayerSprayDecal>();
-                if (!sprayDecal.IsValid || sprayDecal.AccountID == 0)
+                var weapon = entity.As<CBasePlayerWeapon>();
+                if (!weapon.IsValid || weapon.OriginalOwnerXuidLow == 0)
                     return;
-                var player = Core.PlayerManager.GetPlayerFromSteamID(sprayDecal.AccountID);
+                var player = Core.PlayerManager.GetPlayerFromSteamID(weapon.OriginalOwnerXuidLow);
                 if (player == null || player.IsFakeClient || !player.IsValid)
                     return;
-                GivePlayerGraffiti(player, sprayDecal);
+                var isMelee = ItemHelper.IsMeleeDesignerName(designerName);
+                GivePlayerWeaponSkin(player.Controller, weapon, isMelee);
             });
         }
-    }
-
-    public void OnClientProcessUsercmds(IOnClientProcessUsercmdsEvent @event)
-    {
-        if (!IsSprayOnUse.Value)
-            return;
-        SprayPlayerGraffitiThruPlayerButtons(Core.PlayerManager.GetPlayer(@event.PlayerId));
     }
 
     public void OnEntityDeleted(IOnEntityDeletedEvent @event)

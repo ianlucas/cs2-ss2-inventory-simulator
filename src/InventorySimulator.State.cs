@@ -15,10 +15,7 @@ public partial class InventorySimulator
     public readonly ConcurrentDictionary<ulong, long> PlayerCooldownManager = [];
     public readonly ConcurrentDictionary<ulong, long> PlayerSprayCooldownManager = [];
     public readonly ConcurrentDictionary<ulong, PlayerInventory> PlayerInventoryManager = [];
-    public readonly ConcurrentDictionary<ulong, CancellationTokenSource> PlayerUseCmdManager = [];
-    public readonly ConcurrentDictionary<ulong, bool> PlayerUseCmdBlockManager = [];
     public readonly ConcurrentDictionary<ulong, Action> PlayerPostFetchManager = [];
-    public readonly ConcurrentDictionary<string, nint> CreatedCEconItemViewManager = [];
     public readonly ConcurrentDictionary<uint, ulong> ControllerSteamIDManager = [];
     public readonly PlayerInventory EmptyInventory = PlayerInventory.Empty();
     public static readonly string InventoryFileDir = "csgo/addons/swiftlycs2/configs";

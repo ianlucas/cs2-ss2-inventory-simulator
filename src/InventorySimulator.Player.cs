@@ -3,7 +3,6 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-using System.Runtime.InteropServices;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using SwiftlyS2.Shared.Players;
@@ -54,23 +53,6 @@ public partial class InventorySimulator
         }
     }
 
-    public void ClearCreatedCEconItem(ulong steamId)
-    {
-        var prefix = $"{steamId}_";
-        var keysToRemove = CreatedCEconItemViewManager
-            .Keys.Where(key => key.StartsWith(prefix))
-            .ToList();
-        foreach (var key in keysToRemove)
-            if (CreatedCEconItemViewManager.TryRemove(key, out var ptr))
-                Marshal.FreeHGlobal(ptr);
-    }
-
-    public void FreeCreatedCEconItemView()
-    {
-        foreach (var ptr in CreatedCEconItemViewManager.Values)
-            Marshal.FreeHGlobal(ptr);
-    }
-
     public void UpdatePlayerControllerSteamID(IPlayer player)
     {
         var steamID = player.Controller.SteamID;
@@ -102,16 +84,6 @@ public partial class InventorySimulator
             if (oldIndex != controller.Index && steamID == otherSteamID)
                 return;
         ClearPlayerInventory(steamID);
-    }
-
-    public void ClearPlayerUseCmd(ulong steamId)
-    {
-        PlayerUseCmdBlockManager.Remove(steamId, out var _);
-        if (PlayerUseCmdManager.Remove(steamId, out var timer))
-        {
-            timer.Cancel();
-            timer.Dispose();
-        }
     }
 
     public void ClearPlayerPostFetch(ulong steamId)

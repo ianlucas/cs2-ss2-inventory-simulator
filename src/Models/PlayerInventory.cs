@@ -4,16 +4,12 @@
  *--------------------------------------------------------------------------------------------*/
 
 using SwiftlyS2.Shared.Players;
-using SwiftlyS2.Shared.SchemaDefinitions;
 
 namespace InventorySimulator;
 
 public class PlayerInventory(EquippedV3Response data)
 {
     private readonly EquippedV3Response _data = data;
-    public Dictionary<byte, AgentItem> Agents => _data.Agents;
-    public MusicKitItem? MusicKit => _data.MusicKit;
-    public GraffitiItem? Graffiti => _data.Graffiti;
 
     public static PlayerInventory Empty() => new(new());
 
@@ -90,47 +86,5 @@ public class PlayerInventory(EquippedV3Response data)
             }
             wear += 0.001f;
         }
-    }
-
-    public PlayerInventoryItem? GetItemForSlot(
-        loadout_slot_t slot,
-        byte team,
-        bool isMelee,
-        ushort? def,
-        bool fallback,
-        int minModels
-    )
-    {
-        if (
-            slot >= loadout_slot_t.LOADOUT_SLOT_MELEE
-            && slot <= loadout_slot_t.LOADOUT_SLOT_EQUIPMENT5
-        )
-        {
-            var weaponItem =
-                isMelee ? GetKnife(team, fallback)
-                : def.HasValue ? GetWeapon(team, def.Value, fallback)
-                : null;
-            return weaponItem != null ? PlayerInventoryItem.FromWeapon(weaponItem) : null;
-        }
-        if (slot == loadout_slot_t.LOADOUT_SLOT_CLOTHING_CUSTOMPLAYER)
-        {
-            if (minModels > 0)
-                return team == (byte)Team.T
-                    ? PlayerInventoryItem.FromAgent(new AgentItem { Def = 5036 })
-                    : PlayerInventoryItem.FromAgent(new AgentItem { Def = 5037 });
-            if (_data.Agents.TryGetValue(team, out var agentItem) && agentItem.Def != null)
-                return PlayerInventoryItem.FromAgent(agentItem);
-            return null;
-        }
-        if (slot == loadout_slot_t.LOADOUT_SLOT_CLOTHING_HANDS)
-        {
-            var gloveItem = GetGloves(team, fallback);
-            return gloveItem != null ? PlayerInventoryItem.FromGlove(gloveItem) : null;
-        }
-        if (slot == loadout_slot_t.LOADOUT_SLOT_FLAIR0)
-            return _data.Pin.HasValue ? PlayerInventoryItem.FromPin(_data.Pin.Value) : null;
-        if (slot == loadout_slot_t.LOADOUT_SLOT_MUSICKIT)
-            return _data.MusicKit != null ? PlayerInventoryItem.FromMusicKit(_data.MusicKit) : null;
-        return null;
     }
 }

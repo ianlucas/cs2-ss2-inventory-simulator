@@ -39,11 +39,6 @@ public partial class InventorySimulator
         if (!force)
         {
             await FetchPlayerInventory(player.SteamID);
-            Core.Scheduler.NextWorldUpdate(() =>
-            {
-                if (player.IsValid)
-                    GiveOnLoadPlayerInventory(player);
-            });
             return;
         }
         var oldInventory = GetPlayerInventory(player);
@@ -53,7 +48,6 @@ public partial class InventorySimulator
             if (player.IsValid)
             {
                 player.SendChat(Core.Localizer["invsim.ws_completed"]);
-                GiveOnLoadPlayerInventory(player);
                 GiveOnRefreshPlayerInventory(player, oldInventory);
             }
         });

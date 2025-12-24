@@ -33,6 +33,14 @@ public partial class InventorySimulator
         UpdatePlayerControllerSteamID(player);
     }
 
+    public HookResult OnPlayerSpawn(EventPlayerSpawn @event)
+    {
+        var player = @event.UserIdPlayer;
+        if (player != null && !player.IsFakeClient && player.IsValid)
+            GiveOnPlayerSpawn(player);
+        return HookResult.Continue;
+    }
+
     public HookResult OnPlayerDeathPre(EventPlayerDeath @event)
     {
         var attacker = Core.PlayerManager.GetPlayer(@event.Attacker);
@@ -48,23 +56,13 @@ public partial class InventorySimulator
         return HookResult.Continue;
     }
 
-    public HookResult OnRoundMvpPre(EventRoundMvp @event)
-    {
-        var player = @event.UserIdPlayer;
-        if (player != null && !player.IsFakeClient && player.IsValid)
-            GivePlayerMusicKitStatTrakIncrement(player);
-        return HookResult.Continue;
-    }
-
     public HookResult OnPlayerDisconnect(EventPlayerDisconnect @event)
     {
         var player = @event.UserIdPlayer;
         if (player != null && !player.IsFakeClient)
         {
             var steamId = player.SteamID;
-            ClearPlayerUseCmd(steamId);
             ClearPlayerPostFetch(steamId);
-            ClearCreatedCEconItem(steamId);
         }
         return HookResult.Continue;
     }

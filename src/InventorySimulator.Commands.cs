@@ -36,26 +36,6 @@ public partial class InventorySimulator
         player.SendChat(Core.Localizer["invsim.ws_new"]);
     }
 
-    [Command("spray")]
-    public void OnSprayCommand(ICommandContext context)
-    {
-        var player = context.Sender;
-        if (player != null && IsSprayEnabled.Value)
-        {
-            if (PlayerSprayCooldownManager.TryGetValue(player.SteamID, out var timestamp))
-            {
-                var cooldown = SprayCooldown.Value;
-                var diff = DateTimeOffset.UtcNow.ToUnixTimeSeconds() - timestamp;
-                if (diff < cooldown)
-                {
-                    player.SendChat(Core.Localizer["invsim.spray_cooldown", cooldown - diff]);
-                    return;
-                }
-            }
-            SprayPlayerGraffiti(player);
-        }
-    }
-
     [Command("wslogin")]
     public void OnWsloginCommand(ICommandContext context)
     {

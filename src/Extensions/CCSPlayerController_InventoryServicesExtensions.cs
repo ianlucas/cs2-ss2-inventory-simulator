@@ -17,13 +17,4 @@ public static class CCSPlayerController_InventoryServicesExtensions
             ? pawn.Controller.Value.As<CCSPlayerController>()
             : null;
     }
-
-    public static CCSPlayerInventory GetInventory(
-        this CCSPlayerController_InventoryServices inventoryServices
-    )
-    {
-        return new CCSPlayerInventory(
-            inventoryServices.Address + Natives.CCSPlayerController_InventoryServices_m_pInventory
-        );
-    }
 }

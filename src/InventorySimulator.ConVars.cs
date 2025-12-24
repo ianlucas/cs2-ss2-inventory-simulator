@@ -9,25 +9,15 @@ namespace InventorySimulator;
 
 public partial class InventorySimulator
 {
+    public readonly IConVar<int> MinModels = core.ConVar.Create(
+        "invsim_minmodels",
+        "Enable player agents (0 = enabled, 1 = use map models per team, 2 = SAS & Phoenix).",
+        0
+    );
     public readonly IConVar<bool> IsStatTrakIgnoreBots = core.ConVar.Create(
         "invsim_stattrak_ignore_bots",
         "Ignore StatTrak kill count increments for bot kills.",
         true
-    );
-    public readonly IConVar<bool> IsSprayChangerEnabled = core.ConVar.Create(
-        "invsim_spraychanger_enabled",
-        "Replace the player's vanilla spray with their equipped graffiti.",
-        false
-    );
-    public readonly IConVar<bool> IsSprayEnabled = core.ConVar.Create(
-        "invsim_spray_enabled",
-        "Enable spraying via the !spray command and/or use key.",
-        true
-    );
-    public readonly IConVar<bool> IsSprayOnUse = core.ConVar.Create(
-        "invsim_spray_on_use",
-        "Apply spray when the player presses the use key.",
-        false
     );
     public readonly IConVar<bool> IsWsEnabled = core.ConVar.Create(
         "invsim_ws_enabled",
@@ -54,19 +44,9 @@ public partial class InventorySimulator
         "Require the player's inventory to be fetched before allowing them to join the game.",
         false
     );
-    public readonly IConVar<int> MinModels = core.ConVar.Create(
-        "invsim_minmodels",
-        "Enable player agents (0 = enabled, 1 = use map models per team, 2 = SAS & Phoenix).",
-        0
-    );
     public readonly IConVar<int> WsCooldown = core.ConVar.Create(
         "invsim_ws_cooldown",
         "Cooldown duration in seconds between inventory refreshes per player.",
-        30
-    );
-    public readonly IConVar<int> SprayCooldown = core.ConVar.Create(
-        "invsim_spray_cooldown",
-        "Cooldown duration in seconds between sprays per player.",
         30
     );
     public readonly IConVar<string> ApiKey = core.ConVar.Create(

@@ -1,14 +1,8 @@
+invsim_minmodels 0
+    Enable player agents (0 = enabled, 1 = use map models per team, 2 = SAS & Phoenix).
+
 invsim_stattrak_ignore_bots true
     Ignore StatTrak kill count increments for bot kills.
-
-invsim_spraychanger_enabled false
-    Replace the player's vanilla spray with their equipped graffiti.
-
-invsim_spray_enabled true
-    Enable spraying via the !spray command and/or use key.
-
-invsim_spray_on_use false
-    Apply spray when the player presses the use key.
 
 invsim_ws_enabled false
     Allow players to refresh their inventory using the !ws command.
@@ -25,14 +19,8 @@ invsim_fallback_team false
 invsim_require_inventory false
     Require the player's inventory to be fetched before allowing them to join the game.
 
-invsim_minmodels 0
-    Enable player agents (0 = enabled, 1 = use map models per team, 2 = SAS & Phoenix).
-
 invsim_ws_cooldown 30
     Cooldown duration in seconds between inventory refreshes per player.
-
-invsim_spray_cooldown 30
-    Cooldown duration in seconds between sprays per player.
 
 invsim_apikey ""
     API key for the Inventory Simulator service.
@@ -48,9 +36,6 @@ invsim_file "inventories.json"
 
 sw_ws
     Refreshes player inventory from the Inventory Simulator service and displays the configured URL.
-
-sw_spray
-    Applies the player's equipped graffiti spray at their current location.
 
 sw_wslogin
     Authenticates the player with Inventory Simulator and displays their login URL.
