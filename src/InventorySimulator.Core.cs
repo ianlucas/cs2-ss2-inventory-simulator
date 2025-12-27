@@ -57,9 +57,12 @@ public partial class InventorySimulator
         }
         Core.Scheduler.NextWorldUpdate(() =>
         {
-            itemServices.UpdateWearables();
-            if (item != null)
-                pawn.AcceptInput("SetBodygroup", "default_gloves,1");
+            if (pawn.IsValid && itemServices.IsValid)
+            {
+                itemServices.UpdateWearables();
+                if (item != null)
+                    pawn.AcceptInput("SetBodygroup", "default_gloves,1");
+            }
         });
     }
 
