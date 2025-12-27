@@ -41,13 +41,9 @@ public class PlayerInventory
     public EconItem? GetKnife(byte team, bool fallback)
     {
         if (_data.Knives.TryGetValue(team, out var knife))
-        {
             return knife;
-        }
         if (fallback && _data.Knives.TryGetValue(TeamHelper.ToggleTeam(team), out knife))
-        {
             return knife;
-        }
         return null;
     }
 
@@ -59,26 +55,18 @@ public class PlayerInventory
     public EconItem? GetWeapon(byte team, ushort def, bool fallback)
     {
         if (GetWeapons(team).TryGetValue(def, out var weapon))
-        {
             return weapon;
-        }
         if (fallback && GetWeapons(TeamHelper.ToggleTeam(team)).TryGetValue(def, out weapon))
-        {
             return weapon;
-        }
         return null;
     }
 
     public EconItem? GetGloves(byte team, bool fallback)
     {
         if (_data.Gloves.TryGetValue(team, out var glove))
-        {
             return glove;
-        }
         if (fallback && _data.Gloves.TryGetValue(TeamHelper.ToggleTeam(team), out glove))
-        {
             return glove;
-        }
         return null;
     }
 
