@@ -14,7 +14,11 @@ public class PlayerInventory
     public Dictionary<byte, EconItem> Agents => _data.Agents;
     public EconItem? MusicKit => _data.MusicKit;
     public EconItem? Graffiti => _data.Graffiti;
-    public Dictionary<int, Dictionary<float, (ushort, string)>> CachedWeaponEconItems = [];
+
+    public Dictionary<
+        (int paint, float wear),
+        (ushort def, string stickers)
+    > CachedWeaponEconItems = [];
 
     public PlayerInventory(EquippedV4Response data)
     {
@@ -83,32 +87,21 @@ public class PlayerInventory
     // that: 1) it gets regenerated, and 2) there are no rendering issues. As a drawback, every time
     // players use !ws, their weapon's wear will decay, but I think it's a good trade-off since it also
     // forces the sticker to regenerate. This approach is based on workarounds by @stefanx111 and @bklol.
-    public float GetWeaponEconItemWear(EconItem econItem)
+    private float GetWeaponEconItemWear(EconItem econItem)
     {
-        if (
-            econItem.Def == null
-            || econItem.Paint == null
-            || econItem.Wear == null
-            || econItem.Stickers == null
-        )
+        if (econItem is not { Def: not null, Paint: not null, Wear: not null, Stickers: not null })
             return 0;
         var def = econItem.Def.Value;
         var paint = econItem.Paint.Value;
         var wear = econItem.Wear.Value;
         var stickers = string.Join("_", econItem.Stickers.Select(s => s.Def));
-        var cachedByWear = CachedWeaponEconItems.TryGetValue(paint, out var c) ? c : [];
-        while (true)
-        {
-            (ushort, string)? pair = cachedByWear.TryGetValue(wear, out var p) ? p : null;
-            var cached = pair?.Item1 == econItem.Def && pair?.Item2 == stickers;
-            if (pair == null || cached)
-            {
-                cachedByWear[wear] = (def, stickers);
-                CachedWeaponEconItems[paint] = cachedByWear;
-                return wear;
-            }
+        while (
+            CachedWeaponEconItems.TryGetValue((paint, wear), out var cached)
+            && (cached.def != def || cached.stickers != stickers)
+        )
             wear += 0.001f;
-        }
+        CachedWeaponEconItems[(paint, wear)] = (def, stickers);
+        return wear;
     }
 
     public EconItem? GetEconItemForSlot(
