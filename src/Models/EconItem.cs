@@ -44,6 +44,8 @@ public class EconItem
 
     public float? WearOverride { get; set; }
 
+    private (int? statTrak, List<(string, float)> attributes)? _attributesCache;
+
     public override int GetHashCode()
     {
         return Hash?.GetHashCode() ?? 0;
@@ -72,6 +74,8 @@ public class EconItem
 
     public List<(string, float)> GetAttributes()
     {
+        if (_attributesCache != null && _attributesCache.Value.statTrak == Stattrak)
+            return _attributesCache.Value.attributes;
         var attributes = new List<(string, float)>();
         if (Paint != null)
             attributes.Add(("set item texture prefab", Paint.Value));
@@ -106,6 +110,7 @@ public class EconItem
             var musicId = TypeHelper.ViewAs<int, float>(MusicId.Value);
             attributes.Add(("music id", musicId));
         }
+        _attributesCache = (Stattrak, attributes);
         return attributes;
     }
 }
