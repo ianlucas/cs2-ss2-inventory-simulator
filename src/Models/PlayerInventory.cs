@@ -8,25 +8,40 @@ using SwiftlyS2.Shared.SchemaDefinitions;
 
 namespace InventorySimulator;
 
-public class PlayerInventory(EquippedV4Response data)
+public class PlayerInventory
 {
-    private readonly EquippedV4Response _data = data;
+    private readonly EquippedV4Response _data;
     public Dictionary<byte, EconItem> Agents => _data.Agents;
     public EconItem? MusicKit => _data.MusicKit;
     public EconItem? Graffiti => _data.Graffiti;
+    public Dictionary<int, Dictionary<float, (ushort, string)>> CachedWeaponEconItems = [];
+
+    public PlayerInventory(EquippedV4Response data)
+    {
+        _data = data;
+        InitializeWearOverrides();
+    }
 
     public static PlayerInventory Empty() => new(new());
+
+    private void InitializeWearOverrides()
+    {
+        foreach (var knife in _data.Knives.Values)
+            knife.WearOverride = GetWeaponEconItemWear(knife);
+        foreach (var weapon in _data.CTWeapons.Values)
+            weapon.WearOverride = GetWeaponEconItemWear(weapon);
+        foreach (var weapon in _data.TWeapons.Values)
+            weapon.WearOverride = GetWeaponEconItemWear(weapon);
+    }
 
     public EconItem? GetKnife(byte team, bool fallback)
     {
         if (_data.Knives.TryGetValue(team, out var knife))
         {
-            knife.WearOverride = GetWeaponEconItemWear(knife);
             return knife;
         }
         if (fallback && _data.Knives.TryGetValue(TeamHelper.ToggleTeam(team), out knife))
         {
-            knife.WearOverride = GetWeaponEconItemWear(knife);
             return knife;
         }
         return null;
@@ -41,12 +56,10 @@ public class PlayerInventory(EquippedV4Response data)
     {
         if (GetWeapons(team).TryGetValue(def, out var weapon))
         {
-            weapon.WearOverride = GetWeaponEconItemWear(weapon);
             return weapon;
         }
         if (fallback && GetWeapons(TeamHelper.ToggleTeam(team)).TryGetValue(def, out weapon))
         {
-            weapon.WearOverride = GetWeaponEconItemWear(weapon);
             return weapon;
         }
         return null;
@@ -70,9 +83,6 @@ public class PlayerInventory(EquippedV4Response data)
     // that: 1) it gets regenerated, and 2) there are no rendering issues. As a drawback, every time
     // players use !ws, their weapon's wear will decay, but I think it's a good trade-off since it also
     // forces the sticker to regenerate. This approach is based on workarounds by @stefanx111 and @bklol.
-
-    public Dictionary<int, Dictionary<float, (ushort, string)>> CachedWeaponEconItems = [];
-
     public float GetWeaponEconItemWear(EconItem econItem)
     {
         if (
@@ -104,7 +114,7 @@ public class PlayerInventory(EquippedV4Response data)
     public EconItem? GetEconItemForSlot(
         loadout_slot_t slot,
         byte team,
-        ushort? def,
+        ushort def,
         bool fallback,
         int minModels = 0
     )
@@ -114,10 +124,9 @@ public class PlayerInventory(EquippedV4Response data)
             && slot <= loadout_slot_t.LOADOUT_SLOT_EQUIPMENT5
         )
         {
-            var isMelee = slot == loadout_slot_t.LOADOUT_SLOT_MELEE;
-            return isMelee ? GetKnife(team, fallback)
-                : def.HasValue ? GetWeapon(team, def.Value, fallback)
-                : null;
+            return slot == loadout_slot_t.LOADOUT_SLOT_MELEE
+                ? GetKnife(team, fallback)
+                : GetWeapon(team, def, fallback);
         }
         if (slot == loadout_slot_t.LOADOUT_SLOT_CLOTHING_CUSTOMPLAYER)
         {
