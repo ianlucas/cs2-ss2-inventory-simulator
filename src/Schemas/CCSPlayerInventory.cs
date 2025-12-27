@@ -31,6 +31,6 @@ public class CCSPlayerInventory : INativeHandle
 
     public void SendInventoryUpdateEvent()
     {
-        Natives.CPlayerInventory_SendInventoryUpdateEvent.Call(Address);
+        Natives.CCSPlayerInventory_SendInventoryUpdateEvent.Call(Address);
     }
 }
