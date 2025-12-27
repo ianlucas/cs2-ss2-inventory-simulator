@@ -3,15 +3,17 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+using SwiftlyS2.Shared.Memory;
+
 namespace InventorySimulator;
 
 public static partial class Natives
 {
-    private static readonly Lazy<int> _lazyCCSPlayerController_InventoryServices_m_pInventory = new(
-        () =>
-            FromOffset("CCSPlayerController_InventoryServices::m_pInventory")
-    );
+    public delegate nint GetItemSchemaDelegate();
 
-    public static int CCSPlayerController_InventoryServices_m_pInventory =>
-        _lazyCCSPlayerController_InventoryServices_m_pInventory.Value;
+    private static readonly Lazy<IUnmanagedFunction<GetItemSchemaDelegate>> _lazyGetItemSchema =
+        new(() => FromSignature<GetItemSchemaDelegate>("GetItemSchema"));
+
+    public static IUnmanagedFunction<GetItemSchemaDelegate> GetItemSchema =>
+        _lazyGetItemSchema.Value;
 }

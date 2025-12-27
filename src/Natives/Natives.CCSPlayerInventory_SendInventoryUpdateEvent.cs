@@ -9,16 +9,16 @@ namespace InventorySimulator;
 
 public static partial class Natives
 {
-    public delegate nint CPlayerInventory_SendInventoryUpdateEventDelegate(nint thisPtr);
+    public delegate nint CCSPlayerInventory_SendInventoryUpdateEventDelegate(nint thisPtr);
 
     private static readonly Lazy<
-        IUnmanagedFunction<CPlayerInventory_SendInventoryUpdateEventDelegate>
+        IUnmanagedFunction<CCSPlayerInventory_SendInventoryUpdateEventDelegate>
     > _lazyPlayerInventorySendInventoryUpdateEvent = new(() =>
-        FromSignature<CPlayerInventory_SendInventoryUpdateEventDelegate>(
-            "CPlayerInventory::SendInventoryUpdateEvent"
+        FromSignature<CCSPlayerInventory_SendInventoryUpdateEventDelegate>(
+            "CCSPlayerInventory::SendInventoryUpdateEvent"
         )
     );
 
-    public static IUnmanagedFunction<CPlayerInventory_SendInventoryUpdateEventDelegate> CPlayerInventory_SendInventoryUpdateEvent =>
+    public static IUnmanagedFunction<CCSPlayerInventory_SendInventoryUpdateEventDelegate> CCSPlayerInventory_SendInventoryUpdateEvent =>
         _lazyPlayerInventorySendInventoryUpdateEvent.Value;
 }

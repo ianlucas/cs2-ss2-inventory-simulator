@@ -10,13 +10,13 @@ namespace InventorySimulator;
 
 public static class IPlayerExtensions
 {
-    public static bool IsUseCmdBusy(this IPlayer player)
+    public static bool IsUseCmdBusy(this IPlayer self)
     {
-        if (player.PlayerPawn?.IsBuyMenuOpen == true)
+        if (self.PlayerPawn?.IsBuyMenuOpen == true)
             return true;
-        if (player.PlayerPawn?.IsDefusing == true)
+        if (self.PlayerPawn?.IsDefusing == true)
             return true;
-        var weapon = player.PlayerPawn?.WeaponServices?.ActiveWeapon.Value;
+        var weapon = self.PlayerPawn?.WeaponServices?.ActiveWeapon.Value;
         if (weapon?.DesignerName != "weapon_c4")
             return false;
         var c4 = weapon.As<CC4>();

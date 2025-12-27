@@ -19,6 +19,8 @@ public partial class InventorySimulator
         PlayerInventory oldInventory
     )
     {
+        if (MinModels.Value > 0)
+            return;
         var pawn = player.PlayerPawn;
         if (pawn == null)
             return;
@@ -26,7 +28,7 @@ public partial class InventorySimulator
         var oldItem = oldInventory.Agents.TryGetValue(player.Controller.TeamNum, out a) ? a : null;
         if (oldItem == item)
             return;
-        pawn.UpdateModelFromLoadout();
+        pawn.SetModelFromLoadout();
         pawn.SetModelFromClass();
         pawn.AcceptInput("SetBodygroup", "default_gloves,1");
     }
@@ -59,54 +61,6 @@ public partial class InventorySimulator
             if (item != null)
                 pawn.AcceptInput("SetBodygroup", "default_gloves,1");
         });
-    }
-
-    public void GivePlayerWeaponStatTrakIncrement(
-        IPlayer player,
-        string designerName,
-        string weaponItemId
-    )
-    {
-        var weapon = player.PlayerPawn?.WeaponServices?.ActiveWeapon.Value;
-        if (
-            weapon == null
-            || !weapon.HasCustomItemID()
-            || weapon.AttributeManager.Item.AccountID
-                != new CSteamID(player.SteamID).GetAccountID().m_AccountID
-            || weapon.AttributeManager.Item.ItemID != ulong.Parse(weaponItemId)
-        )
-            return;
-        var inventory = GetPlayerInventory(player);
-        var isFallbackTeam = IsFallbackTeam.Value;
-        var item = ItemHelper.IsMeleeDesignerName(designerName)
-            ? inventory.GetKnife(player.Controller.TeamNum, isFallbackTeam)
-            : inventory.GetWeapon(
-                player.Controller.TeamNum,
-                weapon.AttributeManager.Item.ItemDefinitionIndex,
-                isFallbackTeam
-            );
-        if (item == null)
-            return;
-        item.Stattrak += 1;
-        var statTrak = TypeHelper.ViewAs<int, float>(item.Stattrak);
-        weapon.AttributeManager.Item.NetworkedDynamicAttributes.SetOrAddAttribute(
-            "kill eater",
-            statTrak
-        );
-        SendStatTrakIncrement(player.SteamID, item.Uid);
-    }
-
-    public void GivePlayerMusicKitStatTrakIncrement(IPlayer player)
-    {
-        if (PlayerInventoryManager.TryGetValue(player.SteamID, out var inventory))
-        {
-            var item = inventory.MusicKit;
-            if (item != null)
-            {
-                item.Stattrak += 1;
-                SendStatTrakIncrement(player.SteamID, item.Uid);
-            }
-        }
     }
 
     public void RegivePlayerWeapons(
@@ -220,6 +174,54 @@ public partial class InventorySimulator
         }
     }
 
+    public void GivePlayerWeaponStatTrakIncrement(
+        IPlayer player,
+        string designerName,
+        string weaponItemId
+    )
+    {
+        var weapon = player.PlayerPawn?.WeaponServices?.ActiveWeapon.Value;
+        if (
+            weapon == null
+            || !weapon.HasCustomItemID()
+            || weapon.AttributeManager.Item.AccountID
+                != new CSteamID(player.SteamID).GetAccountID().m_AccountID
+            || weapon.AttributeManager.Item.ItemID != ulong.Parse(weaponItemId)
+        )
+            return;
+        var inventory = GetPlayerInventory(player);
+        var isFallbackTeam = IsFallbackTeam.Value;
+        var item = ItemHelper.IsMeleeDesignerName(designerName)
+            ? inventory.GetKnife(player.Controller.TeamNum, isFallbackTeam)
+            : inventory.GetWeapon(
+                player.Controller.TeamNum,
+                weapon.AttributeManager.Item.ItemDefinitionIndex,
+                isFallbackTeam
+            );
+        if (item == null || item.Stattrak == null || item.Uid == null)
+            return;
+        item.Stattrak += 1;
+        var statTrak = TypeHelper.ViewAs<int, float>(item.Stattrak.Value);
+        weapon.AttributeManager.Item.NetworkedDynamicAttributes.SetOrAddAttribute(
+            "kill eater",
+            statTrak
+        );
+        SendStatTrakIncrement(player.SteamID, item.Uid.Value);
+    }
+
+    public void GivePlayerMusicKitStatTrakIncrement(IPlayer player)
+    {
+        if (PlayerInventoryManager.TryGetValue(player.SteamID, out var inventory))
+        {
+            var item = inventory.MusicKit;
+            if (item != null && item.Uid != null)
+            {
+                item.Stattrak += 1;
+                SendStatTrakIncrement(player.SteamID, item.Uid.Value);
+            }
+        }
+    }
+
     public void GiveOnLoadPlayerInventory(IPlayer player)
     {
         var inventory = player.Controller.InventoryServices?.GetInventory();
@@ -238,15 +240,36 @@ public partial class InventorySimulator
         }
     }
 
+    public nint GivePlayerEconItem(
+        ulong steamId,
+        int team,
+        int slot,
+        EconItem econItem,
+        nint copyFrom = 0
+    )
+    {
+        var key = $"{steamId}_{team}_{slot}";
+        if (CreatedCEconItemViewManager.TryGetValue(key, out var existingPtr))
+        {
+            var existingItem = Core.Memory.ToSchemaClass<CEconItemView>(existingPtr);
+            existingItem.ApplyAttributes(econItem, (loadout_slot_t)slot, steamId);
+            return existingPtr;
+        }
+        var item = SchemaHelper.CreateCEconItemView(copyFrom);
+        item.ApplyAttributes(econItem, (loadout_slot_t)slot, steamId);
+        CreatedCEconItemViewManager[key] = item.Address;
+        return item.Address;
+    }
+
     public void GivePlayerGraffiti(IPlayer player, CPlayerSprayDecal sprayDecal)
     {
         var inventory = GetPlayerInventory(player);
         var item = inventory.Graffiti;
-        if (item != null)
+        if (item != null && item.Def != null && item.Tint != null)
         {
-            sprayDecal.Player = item.Def;
+            sprayDecal.Player = item.Def.Value;
             sprayDecal.PlayerUpdated();
-            sprayDecal.TintID = item.Tint;
+            sprayDecal.TintID = item.Tint.Value;
             sprayDecal.TintIDUpdated();
         }
     }
@@ -257,7 +280,7 @@ public partial class InventorySimulator
             return;
         var inventory = GetPlayerInventory(player);
         var item = inventory.Graffiti;
-        if (item == null)
+        if (item == null || item.Def == null || item.Tint == null)
             return;
         var pawn = player.PlayerPawn;
         if (pawn == null || pawn.LifeState != (int)LifeState_t.LIFE_ALIVE)
@@ -282,8 +305,8 @@ public partial class InventorySimulator
             sprayDecal.Left += movementServices.Left;
             sprayDecal.Normal += trace->HitNormal;
             sprayDecal.AccountID = (uint)player.SteamID;
-            sprayDecal.Player = item.Def;
-            sprayDecal.TintID = item.Tint;
+            sprayDecal.Player = item.Def.Value;
+            sprayDecal.TintID = item.Tint.Value;
             sprayDecal.DispatchSpawn();
             SprayCanPaintSound.Recipients.AddRecipient(player.PlayerID);
             SprayCanPaintSound.Emit();
