@@ -9,18 +9,18 @@ namespace InventorySimulator;
 
 public static class CCSPlayerPawnExtensions
 {
-    public static bool IsAbleToApplySpray(this CCSPlayerPawn pawn, IntPtr ptr = 0)
+    public static bool IsAbleToApplySpray(this CCSPlayerPawn self, IntPtr ptr = 0)
     {
-        return Natives.CCSPlayerPawn_IsAbleToApplySpray.Call(pawn.Address, ptr, 0, 0) == nint.Zero;
+        return Natives.CCSPlayerPawn_IsAbleToApplySpray.Call(self.Address, ptr, 0, 0) == nint.Zero;
     }
 
-    public static void UpdateModelFromLoadout(this CCSPlayerPawn pawn)
+    public static void SetModelFromLoadout(this CCSPlayerPawn self)
     {
-        Natives.CCSPlayerPawn_UpdateModelFromLoadout.Call(pawn.Address);
+        Natives.CCSPlayerPawn_SetModelFromLoadout.Call(self.Address);
     }
 
-    public static void SetModelFromClass(this CCSPlayerPawn pawn)
+    public static void SetModelFromClass(this CCSPlayerPawn self)
     {
-        Natives.CCSPlayerPawn_SetModelFromClass.Call(pawn.Address);
+        Natives.CCSPlayerPawn_SetModelFromClass.Call(self.Address);
     }
 }

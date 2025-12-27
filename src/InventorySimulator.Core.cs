@@ -26,7 +26,7 @@ public partial class InventorySimulator
         var oldItem = oldInventory.Agents.TryGetValue(player.Controller.TeamNum, out a) ? a : null;
         if (oldItem == item)
             return;
-        pawn.UpdateModelFromLoadout();
+        pawn.SetModelFromLoadout();
         pawn.SetModelFromClass();
         pawn.AcceptInput("SetBodygroup", "default_gloves,1");
     }

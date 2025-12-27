@@ -9,8 +9,8 @@ namespace InventorySimulator;
 
 public static class CCSPlayer_ItemServicesExtensions
 {
-    public static void UpdateWearables(this CCSPlayer_ItemServices itemServices)
+    public static void UpdateWearables(this CCSPlayer_ItemServices self)
     {
-        Natives.CCSPlayer_ItemServices_UpdateWearables.Call(itemServices.Address);
+        Natives.CCSPlayer_ItemServices_SetWearables.Call(self.Address);
     }
 }
