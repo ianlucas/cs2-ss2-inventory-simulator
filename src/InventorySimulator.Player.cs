@@ -8,7 +8,6 @@ using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using SwiftlyS2.Shared.Players;
 using SwiftlyS2.Shared.SchemaDefinitions;
-using IOFile = System.IO.File;
 
 namespace InventorySimulator;
 
@@ -18,10 +17,10 @@ public partial class InventorySimulator
     {
         try
         {
-            var path = Path.Combine(Core.GameDirectory, InventoryFileDir, File.Value);
-            if (!IOFile.Exists(path))
+            var path = Path.Combine(Core.GameDirectory, InventoryFileDir, ConVars.File.Value);
+            if (!File.Exists(path))
                 return;
-            string json = IOFile.ReadAllText(path);
+            string json = File.ReadAllText(path);
             var inventories = JsonSerializer.Deserialize<Dictionary<ulong, PlayerInventory>>(json);
             if (inventories != null)
             {
@@ -35,7 +34,7 @@ public partial class InventorySimulator
         }
         catch
         {
-            Core.Logger.LogError("Error when processing \"{File}\".", File.Value);
+            Core.Logger.LogError("Error when processing \"{File}\".", ConVars.File.Value);
         }
     }
 

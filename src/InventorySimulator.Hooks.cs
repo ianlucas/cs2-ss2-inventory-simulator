@@ -59,7 +59,7 @@ public partial class InventorySimulator
                                 controller.TeamNum,
                                 itemDef.DefaultLoadoutSlot,
                                 itemDef.DefIndex,
-                                IsFallbackTeam.Value
+                                ConVars.IsFallbackTeam.Value
                             );
                         if (econItem != null)
                             pScriptItem = GivePlayerEconItem(
@@ -94,8 +94,8 @@ public partial class InventorySimulator
                     (byte)team,
                     (loadout_slot_t)slot,
                     item.ItemDefinitionIndex,
-                    IsFallbackTeam.Value,
-                    MinModels.Value
+                    ConVars.IsFallbackTeam.Value,
+                    ConVars.MinModels.Value
                 );
             if (econItem != null)
                 return GivePlayerEconItem(steamId, team, slot, econItem, ret);

@@ -29,7 +29,7 @@ public partial class InventorySimulator
         var designerName = entity.DesignerName;
         if (designerName == "player_spray_decal")
         {
-            if (!IsSprayChangerEnabled.Value)
+            if (!ConVars.IsSprayChangerEnabled.Value)
                 return;
             Core.Scheduler.NextWorldUpdate(() =>
             {
@@ -46,7 +46,7 @@ public partial class InventorySimulator
 
     public void OnClientProcessUsercmds(IOnClientProcessUsercmdsEvent @event)
     {
-        if (!IsSprayOnUse.Value)
+        if (!ConVars.IsSprayOnUse.Value)
             return;
         var player = Core.PlayerManager.GetPlayer(@event.PlayerId);
         if (player != null)

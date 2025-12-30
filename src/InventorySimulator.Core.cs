@@ -19,7 +19,7 @@ public partial class InventorySimulator
         PlayerInventory oldInventory
     )
     {
-        if (MinModels.Value > 0)
+        if (ConVars.MinModels.Value > 0)
             return;
         var pawn = player.PlayerPawn;
         if (pawn == null)
@@ -43,7 +43,7 @@ public partial class InventorySimulator
         var itemServices = pawn?.ItemServices;
         if (pawn == null || itemServices == null)
             return;
-        var isFallbackTeam = IsFallbackTeam.Value;
+        var isFallbackTeam = ConVars.IsFallbackTeam.Value;
         var item = inventory.GetGloves(player.Controller.TeamNum, isFallbackTeam);
         var oldItem = oldInventory.GetGloves(player.Controller.TeamNum, isFallbackTeam);
         if (oldItem == item)
@@ -94,7 +94,7 @@ public partial class InventorySimulator
             )
             {
                 var entityDef = weapon.AttributeManager.Item.ItemDefinitionIndex;
-                var isFallbackTeam = IsFallbackTeam.Value;
+                var isFallbackTeam = ConVars.IsFallbackTeam.Value;
                 var oldItem =
                     data.GearSlot is gear_slot_t.GEAR_SLOT_KNIFE
                         ? oldInventory.GetKnife(player.Controller.TeamNum, isFallbackTeam)
@@ -193,7 +193,7 @@ public partial class InventorySimulator
         )
             return;
         var inventory = GetPlayerInventory(player);
-        var isFallbackTeam = IsFallbackTeam.Value;
+        var isFallbackTeam = ConVars.IsFallbackTeam.Value;
         var item = ItemHelper.IsMeleeDesignerName(designerName)
             ? inventory.GetKnife(player.Controller.TeamNum, isFallbackTeam)
             : inventory.GetWeapon(
@@ -235,7 +235,7 @@ public partial class InventorySimulator
     public void GiveOnRefreshPlayerInventory(IPlayer player, PlayerInventory oldInventory)
     {
         var inventory = GetPlayerInventory(player);
-        if (IsWsImmediately.Value)
+        if (ConVars.IsWsImmediately.Value)
         {
             RegivePlayerAgent(player, inventory, oldInventory);
             RegivePlayerGloves(player, inventory, oldInventory);
@@ -351,7 +351,7 @@ public partial class InventorySimulator
 
     public void OnIsRequireInventoryChanged()
     {
-        if (IsRequireInventory.Value)
+        if (ConVars.IsRequireInventory.Value)
             OnActivatePlayerHookGuid = Natives.CServerSideClientBase_ActivatePlayer.AddHook(
                 OnActivatePlayer
             );

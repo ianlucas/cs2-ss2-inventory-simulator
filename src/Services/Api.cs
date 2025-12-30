@@ -8,42 +8,28 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using SwiftlyS2.Shared;
-using SwiftlyS2.Shared.Convars;
 
 namespace InventorySimulator;
 
 public class Api
 {
+    [SwiftlyInject]
+    private static ISwiftlyCore Core { get; set; } = null!;
+
+    private static readonly HttpClient _httpClient = new() { Timeout = TimeSpan.FromSeconds(30) };
+
     private const int MaxRetries = 3;
+
     private const int RetryDelayMs = 100;
-
-    private static readonly HttpClient _httpClient = new();
-    private static ILogger? _logger;
-    private static IConVar<string>? _url;
-    private static IConVar<string>? _apiKey;
-
-    private static string ApiKey =>
-        _apiKey?.Value
-        ?? throw new InvalidOperationException("API not initialized. Call Initialize() first.");
-
-    public static void Initialize(ISwiftlyCore core, IConVar<string> url, IConVar<string> apiKey)
-    {
-        _logger = core.Logger;
-        _url = url;
-        _apiKey = apiKey;
-        _httpClient.Timeout = TimeSpan.FromSeconds(30);
-    }
 
     public static string GetUrl(string pathname = "")
     {
-        if (_url == null)
-            throw new InvalidOperationException("API not initialized. Call Initialize() first.");
-        return $"{_url.Value}{pathname}";
+        return $"{ConVars.Url.Value}{pathname}";
     }
 
     public static bool HasApiKey()
     {
-        return ApiKey != "";
+        return ConVars.ApiKey.Value != "";
     }
 
     private static async Task<HttpResponseMessage?> SendPostRequest(string url, object request)
@@ -54,12 +40,12 @@ public class Api
             var response = await _httpClient.PostAsync(url, content);
             if (response.StatusCode == HttpStatusCode.Unauthorized)
             {
-                _logger?.LogError("POST {Url} failed, check your invsim_apikey's value.", url);
+                Core.Logger.LogError("POST {Url} failed, check your invsim_apikey's value.", url);
                 return null;
             }
             if (!response.IsSuccessStatusCode)
             {
-                _logger?.LogError(
+                Core.Logger.LogError(
                     "POST {Url} failed with status code: {StatusCode}",
                     url,
                     response.StatusCode
@@ -70,7 +56,7 @@ public class Api
         }
         catch (Exception error)
         {
-            _logger?.LogError("POST {Url} failed: {Message}", url, error.Message);
+            Core.Logger.LogError("POST {Url} failed: {Message}", url, error.Message);
             return null;
         }
     }
@@ -105,7 +91,7 @@ public class Api
             }
             catch (Exception error)
             {
-                _logger?.LogError(
+                Core.Logger.LogError(
                     "GET {Url} failed (attempt {Attempt}/{MaxRetries}): {Message}",
                     url,
                     attempt,
@@ -124,7 +110,7 @@ public class Api
         var url = GetUrl("/api/increment-item-stattrak");
         var request = new StatTrakIncrementRequest
         {
-            ApiKey = ApiKey,
+            ApiKey = ConVars.ApiKey.Value,
             TargetUid = targetUid,
             UserId = userId,
         };
@@ -134,7 +120,7 @@ public class Api
     public static async Task<SignInUserResponse?> SendSignIn(string userId)
     {
         var url = GetUrl("/api/sign-in");
-        var request = new SignInRequest { ApiKey = ApiKey, UserId = userId };
+        var request = new SignInRequest { ApiKey = ConVars.ApiKey.Value, UserId = userId };
         return await PostAsync<SignInUserResponse>(url, request);
     }
 }

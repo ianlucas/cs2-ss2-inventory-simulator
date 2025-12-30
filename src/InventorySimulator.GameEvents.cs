@@ -41,7 +41,7 @@ public partial class InventorySimulator
         {
             var isAttackerValid = !attacker.IsFakeClient && attacker.IsValid;
             var isVictimValid =
-                (!IsStatTrakIgnoreBots.Value || !victim.IsFakeClient) && victim.IsValid;
+                (!ConVars.IsStatTrakIgnoreBots.Value || !victim.IsFakeClient) && victim.IsValid;
             if (isAttackerValid && isVictimValid)
                 GivePlayerWeaponStatTrakIncrement(attacker, @event.Weapon, @event.WeaponItemid);
         }
