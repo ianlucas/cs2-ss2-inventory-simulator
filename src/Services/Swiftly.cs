@@ -9,10 +9,11 @@ namespace InventorySimulator;
 
 public static class Swiftly
 {
-    public static ISwiftlyCore Core { get; private set; } = null!;
+    [SwiftlyInject]
+    public static ISwiftlyCore Core { get; set; } = null!;
 
-    public static void Initialize(ISwiftlyCore core)
+    public static void Initialize()
     {
-        Core = core;
+        _ = Core;
     }
 }

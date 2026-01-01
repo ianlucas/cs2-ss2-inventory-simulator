@@ -25,7 +25,7 @@ public partial class InventorySimulator(ISwiftlyCore core) : BasePlugin(core)
 
     public override void Load(bool hotReload)
     {
-        Swiftly.Initialize(Core);
+        Swiftly.Initialize();
         ConVars.Initialize();
         Core.Event.OnEntityCreated += OnEntityCreated;
         Core.Event.OnEntityDeleted += OnEntityDeleted;
