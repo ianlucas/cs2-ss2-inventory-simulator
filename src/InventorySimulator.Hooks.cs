@@ -65,7 +65,7 @@ public partial class InventorySimulator
                             ConVars.IsFallbackTeam.Value
                         );
                         if (econItem != null)
-                            pScriptItem = controllerState.GetCEconItemView(
+                            pScriptItem = controllerState.GetEconItemView(
                                 controller.TeamNum,
                                 (int)itemDef.DefaultLoadoutSlot,
                                 econItem
@@ -102,7 +102,7 @@ public partial class InventorySimulator
                 ConVars.MinModels.Value
             );
             if (econItem != null)
-                return controllerState.GetCEconItemView(team, slot, econItem, ret);
+                return controllerState.GetEconItemView(team, slot, econItem, ret);
             return ret;
         };
     }

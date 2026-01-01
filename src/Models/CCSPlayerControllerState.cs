@@ -24,7 +24,11 @@ public class CCSPlayerControllerState(ulong steamId)
     public CancellationTokenSource? UseCmdTimer;
     public bool IsUseCmdBlocked = false;
     public Action? PostFetchCallback;
-    public static readonly ConcurrentDictionary<string, nint> CEconItemViewManager = [];
+
+    private static readonly ConcurrentDictionary<
+        (ulong SteamID, int Team, int Slot),
+        nint
+    > _econItemViewManager = [];
 
     public void TriggerPostFetch()
     {
@@ -42,10 +46,10 @@ public class CCSPlayerControllerState(ulong steamId)
         UseCmdTimer = null;
     }
 
-    public nint GetCEconItemView(int team, int slot, EconItem econItem, nint copyFrom = 0)
+    public nint GetEconItemView(int team, int slot, EconItem econItem, nint copyFrom = 0)
     {
-        var key = $"{SteamID}_{team}_{slot}";
-        if (CEconItemViewManager.TryGetValue(key, out var existingPtr))
+        var key = (SteamID, team, slot);
+        if (_econItemViewManager.TryGetValue(key, out var existingPtr))
         {
             var existingItem = Core.Memory.ToSchemaClass<CEconItemView>(existingPtr);
             existingItem.ApplyAttributes(econItem, (loadout_slot_t)slot, SteamID);
@@ -53,21 +57,21 @@ public class CCSPlayerControllerState(ulong steamId)
         }
         var item = SchemaHelper.CreateCEconItemView(copyFrom);
         item.ApplyAttributes(econItem, (loadout_slot_t)slot, SteamID);
-        CEconItemViewManager[key] = item.Address;
+        _econItemViewManager[key] = item.Address;
         return item.Address;
     }
 
-    public void ClearCEconItemView()
+    public void ClearEconItemView()
     {
-        foreach (var key in CEconItemViewManager.Keys)
-            if (key.StartsWith($"{SteamID}_"))
-                if (CEconItemViewManager.TryRemove(key, out var ptr))
+        foreach (var key in _econItemViewManager.Keys)
+            if (key.SteamID == SteamID)
+                if (_econItemViewManager.TryRemove(key, out var ptr))
                     Marshal.FreeHGlobal(ptr);
     }
 
-    public static void ClearAllCEconItemView()
+    public static void ClearAllEconItemView()
     {
-        foreach (var ptr in CEconItemViewManager.Values)
+        foreach (var ptr in _econItemViewManager.Values)
             Marshal.FreeHGlobal(ptr);
     }
 }

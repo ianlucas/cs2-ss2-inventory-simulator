@@ -29,7 +29,7 @@ public static class CCSPlayerControllerExtensions
         public void RemoveState()
         {
             self.State.DisposeUseCmdTimer();
-            self.State.ClearCEconItemView();
+            self.State.ClearEconItemView();
             _controllerStateManager.TryRemove(self.Index, out var _);
         }
     }

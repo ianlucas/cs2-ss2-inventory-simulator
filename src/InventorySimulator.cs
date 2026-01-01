@@ -42,6 +42,6 @@ public partial class InventorySimulator(ISwiftlyCore core) : BasePlugin(core)
 
     public override void Unload()
     {
-        CCSPlayerControllerState.ClearAllCEconItemView();
+        CCSPlayerControllerState.ClearAllEconItemView();
     }
 }
