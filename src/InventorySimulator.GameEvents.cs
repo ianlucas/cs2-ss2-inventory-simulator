@@ -5,7 +5,6 @@
 
 using SwiftlyS2.Shared.GameEventDefinitions;
 using SwiftlyS2.Shared.Misc;
-using SwiftlyS2.Shared.Players;
 
 namespace InventorySimulator;
 
@@ -15,7 +14,7 @@ public partial class InventorySimulator
     {
         var player = @event.UserIdPlayer;
         if (player != null && !player.IsFakeClient)
-            OnPlayerConnect(player);
+            HandlePlayerConnect(player);
         return HookResult.Continue;
     }
 
@@ -23,14 +22,8 @@ public partial class InventorySimulator
     {
         var player = @event.UserIdPlayer;
         if (player != null && !player.IsFakeClient)
-            OnPlayerConnect(player);
+            HandlePlayerConnect(player);
         return HookResult.Continue;
-    }
-
-    public void OnPlayerConnect(IPlayer player)
-    {
-        RefreshPlayerInventory(player);
-        UpdatePlayerControllerSteamID(player);
     }
 
     public HookResult OnPlayerDeathPre(EventPlayerDeath @event)
@@ -41,9 +34,9 @@ public partial class InventorySimulator
         {
             var isAttackerValid = !attacker.IsFakeClient && attacker.IsValid;
             var isVictimValid =
-                (!IsStatTrakIgnoreBots.Value || !victim.IsFakeClient) && victim.IsValid;
+                (!ConVars.IsStatTrakIgnoreBots.Value || !victim.IsFakeClient) && victim.IsValid;
             if (isAttackerValid && isVictimValid)
-                GivePlayerWeaponStatTrakIncrement(attacker, @event.Weapon, @event.WeaponItemid);
+                HandlePlayerWeaponStatTrakIncrement(attacker, @event.Weapon, @event.WeaponItemid);
         }
         return HookResult.Continue;
     }
@@ -52,20 +45,7 @@ public partial class InventorySimulator
     {
         var player = @event.UserIdPlayer;
         if (player != null && !player.IsFakeClient && player.IsValid)
-            GivePlayerMusicKitStatTrakIncrement(player);
-        return HookResult.Continue;
-    }
-
-    public HookResult OnPlayerDisconnect(EventPlayerDisconnect @event)
-    {
-        var player = @event.UserIdPlayer;
-        if (player != null && !player.IsFakeClient)
-        {
-            var steamId = player.SteamID;
-            ClearPlayerUseCmd(steamId);
-            ClearPlayerPostFetch(steamId);
-            ClearCreatedCEconItem(steamId);
-        }
+            HandlePlayerMusicKitStatTrakIncrement(player);
         return HookResult.Continue;
     }
 }

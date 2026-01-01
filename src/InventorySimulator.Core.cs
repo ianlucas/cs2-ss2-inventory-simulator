@@ -13,171 +13,93 @@ namespace InventorySimulator;
 
 public partial class InventorySimulator
 {
-    public void RegivePlayerAgent(
-        IPlayer player,
-        PlayerInventory inventory,
-        PlayerInventory oldInventory
-    )
+    // ========================================================================
+    // Connection & Initialization
+    // ========================================================================
+
+    public void HandlePlayerConnect(IPlayer player)
     {
-        if (MinModels.Value > 0)
-            return;
-        var pawn = player.PlayerPawn;
-        if (pawn == null)
-            return;
-        var item = inventory.Agents.TryGetValue(player.Controller.TeamNum, out var a) ? a : null;
-        var oldItem = oldInventory.Agents.TryGetValue(player.Controller.TeamNum, out a) ? a : null;
-        if (oldItem == item)
-            return;
-        pawn.SetModelFromLoadout();
-        pawn.SetModelFromClass();
-        pawn.AcceptInput("SetBodygroup", "default_gloves,1");
+        player.Controller.Revalidate();
+        HandlePlayerInventoryRefresh(player);
     }
 
-    public void RegivePlayerGloves(
-        IPlayer player,
-        PlayerInventory inventory,
-        PlayerInventory oldInventory
-    )
+    // ========================================================================
+    // Inventory Fetch & Load Operations
+    // ========================================================================
+
+    public static async Task HandlePlayerInventoryFetch(IPlayer player, bool force = false)
     {
-        var pawn = player.PlayerPawn;
-        var itemServices = pawn?.ItemServices;
-        if (pawn == null || itemServices == null)
+        var controllerState = player.Controller.State;
+        var existing = controllerState.Inventory;
+        if (!force && controllerState.Inventory != null)
             return;
-        var isFallbackTeam = IsFallbackTeam.Value;
-        var item = inventory.GetGloves(player.Controller.TeamNum, isFallbackTeam);
-        var oldItem = oldInventory.GetGloves(player.Controller.TeamNum, isFallbackTeam);
-        if (oldItem == item)
+        if (controllerState.IsFetching)
             return;
-        // Workaround by @daffyyyy.
-        var model = pawn.CBodyComponent?.SceneNode?.GetSkeletonInstance()?.ModelState.ModelName;
-        if (!string.IsNullOrEmpty(model))
+        controllerState.IsFetching = true;
+        var response = await Api.FetchEquipped(player.SteamID);
+        if (response != null)
         {
-            pawn.SetModel("characters/models/tm_jumpsuit/tm_jumpsuit_varianta.vmdl");
-            pawn.SetModel(model);
+            var inventory = new PlayerInventory(response);
+            if (existing != null)
+                inventory.CachedWeaponEconItems = existing.CachedWeaponEconItems;
+            controllerState.WsUpdatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            controllerState.Inventory = inventory;
         }
+        controllerState.IsFetching = false;
+        controllerState.TriggerPostFetch();
+    }
+
+    public async void HandlePlayerInventoryRefresh(IPlayer player, bool force = false)
+    {
+        if (!force)
+        {
+            await HandlePlayerInventoryFetch(player);
+            Core.Scheduler.NextWorldUpdate(() =>
+            {
+                if (player.IsValid)
+                    HandlePlayerInventoryLoad(player);
+            });
+            return;
+        }
+        var oldInventory = player.Controller.State.Inventory;
+        await HandlePlayerInventoryFetch(player, true);
         Core.Scheduler.NextWorldUpdate(() =>
         {
-            if (pawn.IsValid && itemServices.IsValid)
+            if (player.IsValid)
             {
-                itemServices.UpdateWearables();
-                if (item != null)
-                    pawn.AcceptInput("SetBodygroup", "default_gloves,1");
+                player.SendChat(Core.Localizer["invsim.ws_completed"]);
+                HandlePlayerInventoryLoad(player);
+                HandlePostPlayerInventoryRefresh(player, oldInventory);
             }
         });
     }
 
-    public void RegivePlayerWeapons(
+    public static void HandlePlayerInventoryLoad(IPlayer player)
+    {
+        var inventory = player.Controller.InventoryServices?.GetInventory();
+        if (inventory?.IsValid == true)
+            inventory.SendInventoryUpdateEvent();
+    }
+
+    public static void HandlePostPlayerInventoryRefresh(
         IPlayer player,
-        PlayerInventory inventory,
-        PlayerInventory oldInventory
+        PlayerInventory? oldInventory
     )
     {
-        var pawn = player.PlayerPawn;
-        var weaponServices = pawn?.WeaponServices?.As<CCSPlayer_WeaponServices>();
-        if (pawn == null || weaponServices == null)
-            return;
-        var activeDesignerName = weaponServices.ActiveWeapon.Value?.DesignerName;
-        var targets = new List<(string, string, int, int, bool, gear_slot_t)>();
-        foreach (var handle in weaponServices.MyWeapons)
+        var inventory = player.Controller.State.Inventory;
+        if (inventory != null && ConVars.IsWsImmediately.Value)
         {
-            var weapon = handle.Value?.As<CCSWeaponBase>();
-            if (weapon == null || weapon.DesignerName.Contains("weapon_") != true)
-                continue;
-            if (weapon.OriginalOwnerXuidLow != (uint)player.SteamID)
-                continue;
-            var data = weapon.VData.As<CCSWeaponBaseVData>();
-            if (
-                data.GearSlot
-                is gear_slot_t.GEAR_SLOT_RIFLE
-                    or gear_slot_t.GEAR_SLOT_PISTOL
-                    or gear_slot_t.GEAR_SLOT_KNIFE
-            )
-            {
-                var entityDef = weapon.AttributeManager.Item.ItemDefinitionIndex;
-                var isFallbackTeam = IsFallbackTeam.Value;
-                var oldItem =
-                    data.GearSlot is gear_slot_t.GEAR_SLOT_KNIFE
-                        ? oldInventory.GetKnife(player.Controller.TeamNum, isFallbackTeam)
-                        : oldInventory.GetWeapon(
-                            player.Controller.TeamNum,
-                            entityDef,
-                            isFallbackTeam
-                        );
-                var item =
-                    data.GearSlot is gear_slot_t.GEAR_SLOT_KNIFE
-                        ? inventory.GetKnife(player.Controller.TeamNum, isFallbackTeam)
-                        : inventory.GetWeapon(player.Controller.TeamNum, entityDef, isFallbackTeam);
-                if (oldItem == item)
-                    continue;
-                var clip = weapon.Clip1;
-                var reserve = weapon.ReserveAmmo[0];
-                targets.Add(
-                    (
-                        weapon.DesignerName,
-                        weapon.GetDesignerName(),
-                        clip,
-                        reserve,
-                        activeDesignerName == weapon.DesignerName,
-                        data.GearSlot
-                    )
-                );
-            }
-        }
-        foreach (var target in targets)
-        {
-            var designerName = target.Item1;
-            var actualDesignerName = target.Item2;
-            var clip = target.Item3;
-            var reserve = target.Item4;
-            var active = target.Item5;
-            var gearSlot = target.Item6;
-            var oldWeapon = (
-                (CHandle<CBasePlayerWeapon>?)
-                    weaponServices.MyWeapons.FirstOrDefault(h =>
-                        h.Value?.DesignerName == designerName
-                    )
-            )?.Value;
-            if (oldWeapon != null)
-            {
-                weaponServices.DropWeapon(oldWeapon);
-                oldWeapon.Despawn();
-            }
-            var weapon = player.PlayerPawn?.ItemServices?.GiveItem<CBasePlayerWeapon>(
-                actualDesignerName
-            );
-            if (weapon != null)
-                Core.Scheduler.Delay(
-                    32,
-                    () =>
-                    {
-                        if (weapon.IsValid)
-                        {
-                            weapon.Clip1 = clip;
-                            weapon.Clip1Updated();
-                            weapon.ReserveAmmo[0] = reserve;
-                            weapon.ReserveAmmoUpdated();
-                            Core.Scheduler.NextWorldUpdate(() =>
-                            {
-                                if (active && player.IsValid)
-                                {
-                                    var command = gearSlot switch
-                                    {
-                                        gear_slot_t.GEAR_SLOT_RIFLE => "slot1",
-                                        gear_slot_t.GEAR_SLOT_PISTOL => "slot2",
-                                        gear_slot_t.GEAR_SLOT_KNIFE => "slot3",
-                                        _ => null,
-                                    };
-                                    if (command != null)
-                                        player.ExecuteCommand(command);
-                                }
-                            });
-                        }
-                    }
-                );
+            player.RegivePlayerAgent(inventory, oldInventory);
+            player.RegivePlayerGloves(inventory, oldInventory);
+            player.RegivePlayerWeapons(inventory, oldInventory);
         }
     }
 
-    public void GivePlayerWeaponStatTrakIncrement(
+    // ========================================================================
+    // Runtime: StatTrak Operations
+    // ========================================================================
+
+    public void HandlePlayerWeaponStatTrakIncrement(
         IPlayer player,
         string designerName,
         string weaponItemId
@@ -192,11 +114,11 @@ public partial class InventorySimulator
             || weapon.AttributeManager.Item.ItemID != ulong.Parse(weaponItemId)
         )
             return;
-        var inventory = GetPlayerInventory(player);
-        var isFallbackTeam = IsFallbackTeam.Value;
+        var inventory = player.Controller.State.Inventory;
+        var isFallbackTeam = ConVars.IsFallbackTeam.Value;
         var item = ItemHelper.IsMeleeDesignerName(designerName)
-            ? inventory.GetKnife(player.Controller.TeamNum, isFallbackTeam)
-            : inventory.GetWeapon(
+            ? inventory?.GetKnife(player.Controller.TeamNum, isFallbackTeam)
+            : inventory?.GetWeapon(
                 player.Controller.TeamNum,
                 weapon.AttributeManager.Item.ItemDefinitionIndex,
                 isFallbackTeam
@@ -209,80 +131,58 @@ public partial class InventorySimulator
             "kill eater",
             statTrak
         );
-        SendStatTrakIncrement(player.SteamID, item.Uid.Value);
+        HandleStatTrakIncrement(player.SteamID, item.Uid.Value);
     }
 
-    public void GivePlayerMusicKitStatTrakIncrement(IPlayer player)
+    public static void HandlePlayerMusicKitStatTrakIncrement(IPlayer player)
     {
-        if (PlayerInventoryManager.TryGetValue(player.SteamID, out var inventory))
+        var item = player.Controller.State.Inventory?.MusicKit;
+        if (item != null && item.Uid != null)
         {
-            var item = inventory.MusicKit;
-            if (item != null && item.Uid != null)
-            {
-                item.Stattrak += 1;
-                SendStatTrakIncrement(player.SteamID, item.Uid.Value);
-            }
+            item.Stattrak += 1;
+            HandleStatTrakIncrement(player.SteamID, item.Uid.Value);
         }
     }
 
-    public void GiveOnLoadPlayerInventory(IPlayer player)
+    public static async void HandleStatTrakIncrement(ulong userId, int targetUid)
     {
-        var inventory = player.Controller.InventoryServices?.GetInventory();
-        if (inventory?.IsValid == true)
-            inventory.SendInventoryUpdateEvent();
+        if (Api.HasApiKey())
+            await Api.SendStatTrakIncrement(targetUid, userId.ToString());
     }
 
-    public void GiveOnRefreshPlayerInventory(IPlayer player, PlayerInventory oldInventory)
+    // ========================================================================
+    // Runtime: Graffiti/Spray Operations
+    // ========================================================================
+
+    public void HandleClientProcessUsercmds(IPlayer player)
     {
-        var inventory = GetPlayerInventory(player);
-        if (IsWsImmediately.Value)
+        if (
+            (player.PressedButtons & GameButtonFlags.E) != 0
+            && player.PlayerPawn?.IsAbleToApplySpray() == true
+        )
         {
-            RegivePlayerAgent(player, inventory, oldInventory);
-            RegivePlayerGloves(player, inventory, oldInventory);
-            RegivePlayerWeapons(player, inventory, oldInventory);
+            var controllerState = player.Controller.State;
+            if (player.IsUseCmdBusy())
+                controllerState.IsUseCmdBlocked = true;
+            controllerState.DisposeUseCmdTimer();
+            controllerState.UseCmdTimer = Core.Scheduler.DelayBySeconds(
+                0.1f,
+                () =>
+                {
+                    if (controllerState.IsUseCmdBlocked)
+                        controllerState.IsUseCmdBlocked = false;
+                    else if (player.IsValid && !player.IsUseCmdBusy())
+                        player.ExecuteCommand("css_spray");
+                }
+            );
         }
     }
 
-    public nint GivePlayerEconItem(
-        ulong steamId,
-        int team,
-        int slot,
-        EconItem econItem,
-        nint copyFrom = 0
-    )
-    {
-        var key = $"{steamId}_{team}_{slot}";
-        if (CreatedCEconItemViewManager.TryGetValue(key, out var existingPtr))
-        {
-            var existingItem = Core.Memory.ToSchemaClass<CEconItemView>(existingPtr);
-            existingItem.ApplyAttributes(econItem, (loadout_slot_t)slot, steamId);
-            return existingPtr;
-        }
-        var item = SchemaHelper.CreateCEconItemView(copyFrom);
-        item.ApplyAttributes(econItem, (loadout_slot_t)slot, steamId);
-        CreatedCEconItemViewManager[key] = item.Address;
-        return item.Address;
-    }
-
-    public void GivePlayerGraffiti(IPlayer player, CPlayerSprayDecal sprayDecal)
-    {
-        var inventory = GetPlayerInventory(player);
-        var item = inventory.Graffiti;
-        if (item != null && item.Def != null && item.Tint != null)
-        {
-            sprayDecal.Player = item.Def.Value;
-            sprayDecal.PlayerUpdated();
-            sprayDecal.TintID = item.Tint.Value;
-            sprayDecal.TintIDUpdated();
-        }
-    }
-
-    public unsafe void SprayPlayerGraffiti(IPlayer player)
+    public unsafe void HandlePlayerGraffitiSpray(IPlayer player)
     {
         if (!player.IsValid)
             return;
-        var inventory = GetPlayerInventory(player);
-        var item = inventory.Graffiti;
+        var item = player.Controller.State.Inventory?.Graffiti;
         if (item == null || item.Def == null || item.Tint == null)
             return;
         var pawn = player.PlayerPawn;
@@ -297,7 +197,7 @@ public partial class InventorySimulator
         SprayCanShakeSound.Recipients.AddRecipient(player.PlayerID);
         SprayCanShakeSound.Emit();
         SprayCanShakeSound.Recipients.RemoveRecipient(player.PlayerID);
-        PlayerSprayCooldownManager[player.SteamID] = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        player.Controller.State.SprayUsedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         var sprayDecal = Core.EntitySystem.CreateEntityByDesignerName<CPlayerSprayDecal>(
             "player_spray_decal"
         );
@@ -317,45 +217,74 @@ public partial class InventorySimulator
         }
     }
 
-    public void SprayPlayerGraffitiThruPlayerButtons(IPlayer player)
+    public static void HandlePlayerSprayDecalCreated(IPlayer player, CPlayerSprayDecal sprayDecal)
     {
-        if (
-            (player.PressedButtons & GameButtonFlags.E) != 0
-            && player.PlayerPawn?.IsAbleToApplySpray() == true
-        )
+        var item = player.Controller.State.Inventory?.Graffiti;
+        if (item != null && item.Def != null && item.Tint != null)
         {
-            if (player.IsUseCmdBusy())
-                PlayerUseCmdBlockManager[player.SteamID] = true;
-            if (PlayerUseCmdManager.TryGetValue(player.SteamID, out var timer))
-            {
-                timer.Cancel();
-                timer.Dispose();
-            }
-            PlayerUseCmdManager[player.SteamID] = Core.Scheduler.DelayBySeconds(
-                0.1f,
-                () =>
-                {
-                    if (PlayerUseCmdBlockManager.ContainsKey(player.SteamID))
-                        PlayerUseCmdBlockManager.Remove(player.SteamID, out var _);
-                    else if (player.IsValid && !player.IsUseCmdBusy())
-                        player.ExecuteCommand("css_spray");
-                }
-            );
+            sprayDecal.Player = item.Def.Value;
+            sprayDecal.PlayerUpdated();
+            sprayDecal.TintID = item.Tint.Value;
+            sprayDecal.TintIDUpdated();
         }
     }
 
-    public void OnFileChanged()
+    // ========================================================================
+    // Runtime: Authentication
+    // ========================================================================
+
+    public async void HandleSignIn(IPlayer player)
     {
-        LoadPlayerInventories();
+        var controllerState = player.Controller.State;
+        if (controllerState.IsFetching)
+            return;
+        controllerState.IsFetching = true;
+        var response = await Api.SendSignIn(player.SteamID.ToString());
+        controllerState.IsFetching = false;
+        Core.Scheduler.NextWorldUpdate(() =>
+        {
+            if (response == null)
+            {
+                player?.SendChat(Core.Localizer["invsim.login_failed"]);
+                return;
+            }
+            player?.SendChat(
+                Core.Localizer[
+                    "invsim.login",
+                    $"{Api.GetUrl("/api/sign-in/callback")}?token={response.Token}"
+                ]
+            );
+        });
     }
 
-    public void OnIsRequireInventoryChanged()
+    // ========================================================================
+    // Configuration & File Management
+    // ========================================================================
+
+    public void HandleFileChanged()
     {
-        if (IsRequireInventory.Value)
+        if (Inventories.Load())
+            foreach (var player in Core.PlayerManager.GetAllPlayers())
+                if (Inventories.TryGet(player.SteamID, out var inventory))
+                    player.Controller.State.Inventory = inventory;
+    }
+
+    public void HandleIsRequireInventoryChanged()
+    {
+        if (ConVars.IsRequireInventory.Value)
             OnActivatePlayerHookGuid = Natives.CServerSideClientBase_ActivatePlayer.AddHook(
                 OnActivatePlayer
             );
         else if (OnActivatePlayerHookGuid != null)
             Natives.CServerSideClientBase_ActivatePlayer.RemoveHook(OnActivatePlayerHookGuid.Value);
+    }
+
+    // ========================================================================
+    // Cleanup & Disconnection
+    // ========================================================================
+
+    public static void HandleControllerDeleted(CCSPlayerController controller)
+    {
+        controller.RemoveState();
     }
 }

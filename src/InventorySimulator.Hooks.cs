@@ -20,18 +20,22 @@ public partial class InventorySimulator
                 Marshal.ReadInt16(thisPtr + Natives.CServerSideClientBase_m_UserID);
             var player = Core.PlayerManager.GetPlayer(userid);
             if (player != null && !player.IsFakeClient && player.Controller != null)
-                if (!PlayerInventoryManager.ContainsKey(player.SteamID))
+            {
+                player.Controller.Revalidate();
+                var controllerState = player.Controller.State;
+                if (controllerState.Inventory == null)
                 {
-                    PlayerPostFetchManager[player.SteamID] = () =>
+                    controllerState.PostFetchCallback = () =>
                         Core.Scheduler.NextWorldUpdate(() =>
                         {
                             if (player.Controller.IsValid)
                                 Natives.CServerSideClientBase_ActivatePlayer.CallOriginal(thisPtr);
                         });
-                    if (!PlayerInFetchManager.ContainsKey(player.SteamID))
-                        RefreshPlayerInventory(player);
+                    if (!controllerState.IsFetching)
+                        HandlePlayerInventoryRefresh(player);
                     return;
                 }
+            }
             next()(thisPtr);
         };
     }
@@ -54,16 +58,15 @@ public partial class InventorySimulator
                         ?.GetItemDefinitionByName(designerName);
                     if (itemDef != null)
                     {
-                        var econItem = GetPlayerInventoryBySteamID(controller.SteamID)
-                            .GetEconItemForSlot(
-                                controller.TeamNum,
-                                itemDef.DefaultLoadoutSlot,
-                                itemDef.DefIndex,
-                                IsFallbackTeam.Value
-                            );
+                        var controllerState = controller.State;
+                        var econItem = controllerState.Inventory?.GetEconItemForSlot(
+                            controller.TeamNum,
+                            itemDef.DefaultLoadoutSlot,
+                            itemDef.DefIndex,
+                            ConVars.IsFallbackTeam.Value
+                        );
                         if (econItem != null)
-                            pScriptItem = GivePlayerEconItem(
-                                controller.SteamID,
+                            pScriptItem = controllerState.GetEconItemView(
                                 controller.TeamNum,
                                 (int)itemDef.DefaultLoadoutSlot,
                                 econItem
@@ -88,17 +91,19 @@ public partial class InventorySimulator
             var item = Core.Memory.ToSchemaClass<CEconItemView>(ret);
             if (!item.IsValid)
                 return ret;
-            var steamId = inventory.SOCache.Owner.SteamID;
-            var econItem = GetPlayerInventoryBySteamID(inventory.SOCache.Owner.SteamID)
-                .GetEconItemForSlot(
-                    (byte)team,
-                    (loadout_slot_t)slot,
-                    item.ItemDefinitionIndex,
-                    IsFallbackTeam.Value,
-                    MinModels.Value
-                );
+            var player = Core.PlayerManager.GetPlayerFromSteamID(inventory.SOCache.Owner.SteamID);
+            if (player == null)
+                return ret;
+            var controllerState = player.Controller.State;
+            var econItem = controllerState.Inventory?.GetEconItemForSlot(
+                (byte)team,
+                (loadout_slot_t)slot,
+                item.ItemDefinitionIndex,
+                ConVars.IsFallbackTeam.Value,
+                ConVars.MinModels.Value
+            );
             if (econItem != null)
-                return GivePlayerEconItem(steamId, team, slot, econItem, ret);
+                return controllerState.GetEconItemView(team, slot, econItem, ret);
             return ret;
         };
     }
