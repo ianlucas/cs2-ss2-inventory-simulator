@@ -18,8 +18,8 @@ public class CCSPlayerControllerState(ulong steamId)
     public bool IsFetching = false;
     public bool IsAuthenticating = false;
     public bool IsLoadedFromFile = false;
-    public long WsCooldown = 0;
-    public long SprayCooldown = 0;
+    public long WsUpdatedAt = 0;
+    public long SprayUsedAt = 0;
     public PlayerInventory? Inventory = Inventories.Get(steamId);
     public CancellationTokenSource? UseCmdTimer;
     public bool IsUseCmdBlocked = false;

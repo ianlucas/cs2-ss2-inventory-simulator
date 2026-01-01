@@ -42,7 +42,7 @@ public partial class InventorySimulator
             var inventory = new PlayerInventory(response);
             if (existing != null)
                 inventory.CachedWeaponEconItems = existing.CachedWeaponEconItems;
-            controllerState.WsCooldown = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            controllerState.WsUpdatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             controllerState.Inventory = inventory;
         }
         controllerState.IsFetching = false;
@@ -197,7 +197,7 @@ public partial class InventorySimulator
         SprayCanShakeSound.Recipients.AddRecipient(player.PlayerID);
         SprayCanShakeSound.Emit();
         SprayCanShakeSound.Recipients.RemoveRecipient(player.PlayerID);
-        player.Controller.State.SprayCooldown = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        player.Controller.State.SprayUsedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         var sprayDecal = Core.EntitySystem.CreateEntityByDesignerName<CPlayerSprayDecal>(
             "player_spray_decal"
         );

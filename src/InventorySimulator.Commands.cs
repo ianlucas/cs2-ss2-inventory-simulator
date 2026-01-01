@@ -19,7 +19,7 @@ public partial class InventorySimulator
             return;
         var controllerState = player.Controller.State;
         var cooldown = ConVars.WsCooldown.Value;
-        var diff = DateTimeOffset.UtcNow.ToUnixTimeSeconds() - controllerState.WsCooldown;
+        var diff = DateTimeOffset.UtcNow.ToUnixTimeSeconds() - controllerState.WsUpdatedAt;
         if (diff < cooldown)
         {
             player.SendChat(Core.Localizer["invsim.ws_cooldown", cooldown - diff]);
@@ -42,7 +42,7 @@ public partial class InventorySimulator
         {
             var controllerState = player.Controller.State;
             var cooldown = ConVars.SprayCooldown.Value;
-            var diff = DateTimeOffset.UtcNow.ToUnixTimeSeconds() - controllerState.SprayCooldown;
+            var diff = DateTimeOffset.UtcNow.ToUnixTimeSeconds() - controllerState.SprayUsedAt;
             if (diff < cooldown)
             {
                 player.SendChat(Core.Localizer["invsim.spray_cooldown", cooldown - diff]);
