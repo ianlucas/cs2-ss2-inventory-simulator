@@ -62,7 +62,7 @@ public partial class InventorySimulator
             player.SendChat(Core.Localizer["invsim.login_in_progress"]);
             if (controllerState.IsAuthenticating)
                 return;
-            SendSignIn(player.SteamID);
+            SendSignIn(player);
         }
     }
 }

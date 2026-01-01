@@ -36,8 +36,8 @@ public partial class InventorySimulator(ISwiftlyCore core) : BasePlugin(core)
         Core.GameEvent.HookPre<EventRoundMvp>(OnRoundMvpPre);
         Natives.CCSPlayer_ItemServices_GiveNamedItem.AddHook(OnGiveNamedItem);
         Natives.CCSPlayerInventory_GetItemInLoadout.AddHook(OnGetItemInLoadout);
-        OnFileChanged();
-        OnIsRequireInventoryChanged();
+        HandleFileChanged();
+        HandleIsRequireInventoryChanged();
     }
 
     public override void Unload()

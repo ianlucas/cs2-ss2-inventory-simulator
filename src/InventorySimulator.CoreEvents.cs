@@ -15,10 +15,10 @@ public partial class InventorySimulator
         switch (@event.ConVarName)
         {
             case "invsim_file":
-                OnFileChanged();
+                HandleFileChanged();
                 return;
             case "invsim_require_inventory":
-                OnIsRequireInventoryChanged();
+                HandleIsRequireInventoryChanged();
                 return;
         }
     }
@@ -39,7 +39,7 @@ public partial class InventorySimulator
                 var player = Core.PlayerManager.GetPlayerFromSteamID(sprayDecal.AccountID);
                 if (player == null || player.IsFakeClient || !player.IsValid)
                     return;
-                GivePlayerGraffiti(player, sprayDecal);
+                HandlePlayerSprayDecalCreated(player, sprayDecal);
             });
         }
     }
@@ -50,7 +50,7 @@ public partial class InventorySimulator
             return;
         var player = Core.PlayerManager.GetPlayer(@event.PlayerId);
         if (player != null)
-            SprayPlayerGraffitiThruPlayerButtons(player);
+            HandleClientProcessUsercmds(player);
     }
 
     public void OnEntityDeleted(IOnEntityDeletedEvent @event)
@@ -61,7 +61,7 @@ public partial class InventorySimulator
         {
             var controller = entity.As<CCSPlayerController>();
             if (controller.SteamID != 0)
-                controller.RemoveState();
+                HandleControllerDeleted(controller);
         }
     }
 }

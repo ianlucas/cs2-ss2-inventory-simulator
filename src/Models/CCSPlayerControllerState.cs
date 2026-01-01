@@ -26,6 +26,15 @@ public class CCSPlayerControllerState(ulong steamId)
     public Action? PostFetchCallback;
     public static readonly ConcurrentDictionary<string, nint> CEconItemViewManager = [];
 
+    public void TriggerPostFetch()
+    {
+        if (PostFetchCallback != null)
+        {
+            PostFetchCallback();
+            PostFetchCallback = null;
+        }
+    }
+
     public void DisposeUseCmdTimer()
     {
         UseCmdTimer?.Cancel();
