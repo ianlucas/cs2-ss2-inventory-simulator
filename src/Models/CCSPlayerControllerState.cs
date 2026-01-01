@@ -13,7 +13,7 @@ namespace InventorySimulator;
 public class CCSPlayerControllerState(ulong steamId)
 {
     [SwiftlyInject]
-    private ISwiftlyCore Core { get; set; } = null!;
+    private static ISwiftlyCore Core { get; set; } = null!;
     public ulong SteamID = steamId;
     public bool IsFetching = false;
     public bool IsAuthenticating = false;

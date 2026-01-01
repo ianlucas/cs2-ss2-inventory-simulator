@@ -21,6 +21,7 @@ public partial class InventorySimulator
             var player = Core.PlayerManager.GetPlayer(userid);
             if (player != null && !player.IsFakeClient && player.Controller != null)
             {
+                player.Controller.Revalidate();
                 var controllerState = player.Controller.State;
                 if (controllerState.Inventory == null)
                 {
