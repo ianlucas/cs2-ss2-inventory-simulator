@@ -10,7 +10,7 @@ using SwiftlyS2.Shared;
 
 namespace InventorySimulator;
 
-public static class InventoriesFile
+public static class Inventories
 {
     [SwiftlyInject]
     private static ISwiftlyCore Core { get; set; } = null!;
@@ -41,10 +41,7 @@ public static class InventoriesFile
         }
     }
 
-    public static bool TryGetBySteamID(
-        ulong steamId,
-        [MaybeNullWhen(false)] out PlayerInventory inventory
-    )
+    public static bool TryGet(ulong steamId, [MaybeNullWhen(false)] out PlayerInventory inventory)
     {
         if (_loadedInventories.TryGetValue(steamId, out var value))
         {
@@ -55,7 +52,7 @@ public static class InventoriesFile
         return false;
     }
 
-    public static PlayerInventory? GetBySteamID(ulong steamId)
+    public static PlayerInventory? Get(ulong steamId)
     {
         return _loadedInventories.TryGetValue(steamId, out var inventory) ? inventory : null;
     }

@@ -241,9 +241,9 @@ public partial class InventorySimulator
 
     public void HandleFileChanged()
     {
-        if (InventoriesFile.Load())
+        if (Inventories.Load())
             foreach (var player in Core.PlayerManager.GetAllPlayers())
-                if (InventoriesFile.TryGetBySteamID(player.SteamID, out var inventory))
+                if (Inventories.TryGet(player.SteamID, out var inventory))
                     player.Controller.State.Inventory = inventory;
     }
 
