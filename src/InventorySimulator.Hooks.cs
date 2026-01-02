@@ -22,7 +22,7 @@ public partial class InventorySimulator
             if (player != null && !player.IsFakeClient && player.Controller != null)
             {
                 player.Controller.Revalidate();
-                var controllerState = player.Controller.State;
+                var controllerState = player.Controller.GetState();
                 if (controllerState.Inventory == null)
                 {
                     controllerState.PostFetchCallback = () =>
@@ -58,7 +58,7 @@ public partial class InventorySimulator
                         ?.GetItemDefinitionByName(designerName);
                     if (itemDef != null)
                     {
-                        var controllerState = controller.State;
+                        var controllerState = controller.GetState();
                         var econItem = controllerState.Inventory?.GetEconItemForSlot(
                             controller.TeamNum,
                             itemDef.DefaultLoadoutSlot,
@@ -94,7 +94,7 @@ public partial class InventorySimulator
             var player = Core.PlayerManager.GetPlayerFromSteamID(inventory.SOCache.Owner.SteamID);
             if (player == null)
                 return ret;
-            var controllerState = player.Controller.State;
+            var controllerState = player.Controller.GetState();
             var econItem = controllerState.Inventory?.GetEconItemForSlot(
                 (byte)team,
                 (loadout_slot_t)slot,

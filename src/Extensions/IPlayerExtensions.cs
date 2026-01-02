@@ -26,7 +26,7 @@ public static class IPlayerExtensions
             return c4.IsPlantingViaUse;
         }
 
-        public void RegivePlayerAgent(PlayerInventory inventory, PlayerInventory? oldInventory)
+        public void RegiveAgent(PlayerInventory inventory, PlayerInventory? oldInventory)
         {
             if (ConVars.MinModels.Value > 0)
                 return;
@@ -44,7 +44,7 @@ public static class IPlayerExtensions
             pawn.AcceptInput("SetBodygroup", "default_gloves,1");
         }
 
-        public void RegivePlayerGloves(PlayerInventory inventory, PlayerInventory? oldInventory)
+        public void RegiveGloves(PlayerInventory inventory, PlayerInventory? oldInventory)
         {
             var pawn = self.PlayerPawn;
             var itemServices = pawn?.ItemServices;
@@ -74,7 +74,7 @@ public static class IPlayerExtensions
             });
         }
 
-        public void RegivePlayerWeapons(PlayerInventory inventory, PlayerInventory? oldInventory)
+        public void RegiveWeapons(PlayerInventory inventory, PlayerInventory? oldInventory)
         {
             var pawn = self.PlayerPawn;
             var weaponServices = pawn?.WeaponServices?.As<CCSPlayer_WeaponServices>();

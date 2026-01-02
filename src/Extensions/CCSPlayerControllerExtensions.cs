@@ -17,19 +17,22 @@ public static class CCSPlayerControllerExtensions
 
     extension(CCSPlayerController self)
     {
-        public CCSPlayerControllerState State =>
-            _controllerStateManager.GetOrAdd(self.Index, _ => new(self.SteamID));
+        public CCSPlayerControllerState GetState()
+        {
+            return _controllerStateManager.GetOrAdd(self.Index, _ => new(self.SteamID));
+        }
 
         public void Revalidate()
         {
-            if (self.State.SteamID != self.SteamID)
+            if (self.GetState().SteamID != self.SteamID)
                 self.RemoveState();
         }
 
         public void RemoveState()
         {
-            self.State.DisposeUseCmdTimer();
-            self.State.ClearEconItemView();
+            var controllerState = self.GetState();
+            controllerState.DisposeUseCmdTimer();
+            controllerState.ClearEconItemView();
             _controllerStateManager.TryRemove(self.Index, out var _);
         }
     }

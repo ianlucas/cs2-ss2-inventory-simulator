@@ -29,7 +29,7 @@ public partial class InventorySimulator
 
     public static async Task HandlePlayerInventoryFetch(IPlayer player, bool force = false)
     {
-        var controllerState = player.Controller.State;
+        var controllerState = player.Controller.GetState();
         var existing = controllerState.Inventory;
         if (!force && controllerState.Inventory != null)
             return;
@@ -61,7 +61,7 @@ public partial class InventorySimulator
             });
             return;
         }
-        var oldInventory = player.Controller.State.Inventory;
+        var oldInventory = player.Controller.GetState().Inventory;
         await HandlePlayerInventoryFetch(player, true);
         Core.Scheduler.NextWorldUpdate(() =>
         {
@@ -86,12 +86,12 @@ public partial class InventorySimulator
         PlayerInventory? oldInventory
     )
     {
-        var inventory = player.Controller.State.Inventory;
+        var inventory = player.Controller.GetState().Inventory;
         if (inventory != null && ConVars.IsWsImmediately.Value)
         {
-            player.RegivePlayerAgent(inventory, oldInventory);
-            player.RegivePlayerGloves(inventory, oldInventory);
-            player.RegivePlayerWeapons(inventory, oldInventory);
+            player.RegiveAgent(inventory, oldInventory);
+            player.RegiveGloves(inventory, oldInventory);
+            player.RegiveWeapons(inventory, oldInventory);
         }
     }
 
@@ -114,7 +114,7 @@ public partial class InventorySimulator
             || weapon.AttributeManager.Item.ItemID != ulong.Parse(weaponItemId)
         )
             return;
-        var inventory = player.Controller.State.Inventory;
+        var inventory = player.Controller.GetState().Inventory;
         var isFallbackTeam = ConVars.IsFallbackTeam.Value;
         var item = ItemHelper.IsMeleeDesignerName(designerName)
             ? inventory?.GetKnife(player.Controller.TeamNum, isFallbackTeam)
@@ -136,7 +136,7 @@ public partial class InventorySimulator
 
     public static void HandlePlayerMusicKitStatTrakIncrement(IPlayer player)
     {
-        var item = player.Controller.State.Inventory?.MusicKit;
+        var item = player.Controller.GetState().Inventory?.MusicKit;
         if (item != null && item.Uid != null)
         {
             item.Stattrak += 1;
@@ -161,7 +161,7 @@ public partial class InventorySimulator
             && player.PlayerPawn?.IsAbleToApplySpray() == true
         )
         {
-            var controllerState = player.Controller.State;
+            var controllerState = player.Controller.GetState();
             if (player.IsUseCmdBusy())
                 controllerState.IsUseCmdBlocked = true;
             controllerState.DisposeUseCmdTimer();
@@ -182,7 +182,7 @@ public partial class InventorySimulator
     {
         if (!player.IsValid)
             return;
-        var item = player.Controller.State.Inventory?.Graffiti;
+        var item = player.Controller.GetState().Inventory?.Graffiti;
         if (item == null || item.Def == null || item.Tint == null)
             return;
         var pawn = player.PlayerPawn;
@@ -197,7 +197,7 @@ public partial class InventorySimulator
         SprayCanShakeSound.Recipients.AddRecipient(player.PlayerID);
         SprayCanShakeSound.Emit();
         SprayCanShakeSound.Recipients.RemoveRecipient(player.PlayerID);
-        player.Controller.State.SprayUsedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        player.Controller.GetState().SprayUsedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         var sprayDecal = Core.EntitySystem.CreateEntityByDesignerName<CPlayerSprayDecal>(
             "player_spray_decal"
         );
@@ -219,7 +219,7 @@ public partial class InventorySimulator
 
     public static void HandlePlayerSprayDecalCreated(IPlayer player, CPlayerSprayDecal sprayDecal)
     {
-        var item = player.Controller.State.Inventory?.Graffiti;
+        var item = player.Controller.GetState().Inventory?.Graffiti;
         if (item != null && item.Def != null && item.Tint != null)
         {
             sprayDecal.Player = item.Def.Value;
@@ -235,7 +235,7 @@ public partial class InventorySimulator
 
     public async void HandleSignIn(IPlayer player)
     {
-        var controllerState = player.Controller.State;
+        var controllerState = player.Controller.GetState();
         if (controllerState.IsFetching)
             return;
         controllerState.IsFetching = true;
@@ -266,7 +266,7 @@ public partial class InventorySimulator
         if (Inventories.Load())
             foreach (var player in Core.PlayerManager.GetAllPlayers())
                 if (Inventories.TryGet(player.SteamID, out var inventory))
-                    player.Controller.State.Inventory = inventory;
+                    player.Controller.GetState().Inventory = inventory;
     }
 
     public void HandleIsRequireInventoryChanged()
