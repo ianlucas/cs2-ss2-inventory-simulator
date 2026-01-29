@@ -8,24 +8,18 @@ using SwiftlyS2.Shared.SchemaDefinitions;
 
 namespace InventorySimulator;
 
-public class PlayerInventory
+public class PlayerInventory(EquippedV4Response data)
 {
-    private readonly EquippedV4Response _data;
+    private readonly EquippedV4Response _data = data;
     public Dictionary<byte, InventoryItem> Agents => _data.Agents;
     public InventoryItem? MusicKit => _data.MusicKit;
     public InventoryItem? Graffiti => _data.Graffiti;
 
     public Dictionary<(int paint, float wear), (ushort def, string stickers)> WeaponWearCache = [];
 
-    public PlayerInventory(EquippedV4Response data)
-    {
-        _data = data;
-        InitializeWearOverrides();
-    }
-
     public static PlayerInventory Empty() => new(new());
 
-    private void InitializeWearOverrides()
+    public void InitializeWearOverrides()
     {
         foreach (var knife in _data.Knives.Values)
             knife.WearOverride = GetWeaponWear(knife);
