@@ -18,7 +18,7 @@ public static partial class Natives
     private static readonly Lazy<
         IUnmanagedFunction<CCSPlayerInventory_GetItemInLoadoutDelegate>
     > _lazyGetItemInLoadout = new(() =>
-        FromSignature<CCSPlayerInventory_GetItemInLoadoutDelegate>(
+        GetFunctionBySignature<CCSPlayerInventory_GetItemInLoadoutDelegate>(
             "CCSPlayerInventory::GetItemInLoadout"
         )
     );

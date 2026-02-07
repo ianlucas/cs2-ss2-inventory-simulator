@@ -14,7 +14,7 @@ public static partial class Natives
     private static readonly Lazy<
         IUnmanagedFunction<CCSPlayer_ItemServices_SetWearablesDelegate>
     > _lazySetWearables = new(() =>
-        FromSignature<CCSPlayer_ItemServices_SetWearablesDelegate>(
+        GetFunctionBySignature<CCSPlayer_ItemServices_SetWearablesDelegate>(
             "CCSPlayer_ItemServices::SetWearables"
         )
     );

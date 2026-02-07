@@ -14,7 +14,7 @@ public static partial class Natives
     private static readonly Lazy<
         IUnmanagedFunction<CEconItemView_ConstructorDelegate>
     > _lazyEconItemViewConstructor = new(() =>
-        FromSignature<CEconItemView_ConstructorDelegate>("CEconItemView::CEconItemView")
+        GetFunctionBySignature<CEconItemView_ConstructorDelegate>("CEconItemView::CEconItemView")
     );
 
     public static IUnmanagedFunction<CEconItemView_ConstructorDelegate> CEconItemView_Constructor =>

@@ -14,7 +14,7 @@ public static partial class Natives
     private static readonly Lazy<
         IUnmanagedFunction<CServerSideClientBase_ActivatePlayerDelegate>
     > _lazyActivatePlayer = new(() =>
-        FromSignature<CServerSideClientBase_ActivatePlayerDelegate>(
+        GetFunctionBySignature<CServerSideClientBase_ActivatePlayerDelegate>(
             "CServerSideClientBase::ActivatePlayer"
         )
     );

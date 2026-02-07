@@ -14,7 +14,7 @@ public static partial class Natives
     private static readonly Lazy<
         IUnmanagedFunction<CCSPlayerInventory_SendInventoryUpdateEventDelegate>
     > _lazyPlayerInventorySendInventoryUpdateEvent = new(() =>
-        FromSignature<CCSPlayerInventory_SendInventoryUpdateEventDelegate>(
+        GetFunctionBySignature<CCSPlayerInventory_SendInventoryUpdateEventDelegate>(
             "CCSPlayerInventory::SendInventoryUpdateEvent"
         )
     );

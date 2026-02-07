@@ -9,7 +9,9 @@ namespace InventorySimulator;
 
 public static partial class Natives
 {
-    private static IUnmanagedFunction<TDelegate> FromSignature<TDelegate>(string signatureName)
+    private static IUnmanagedFunction<TDelegate> GetFunctionBySignature<TDelegate>(
+        string signatureName
+    )
         where TDelegate : Delegate
     {
         nint? address = Swiftly.Core.GameData.GetSignature(signatureName);
@@ -20,8 +22,8 @@ public static partial class Natives
         return Swiftly.Core.Memory.GetUnmanagedFunctionByAddress<TDelegate>(address.Value);
     }
 
-    private static int FromOffset(string offset)
+    private static int GetOffset(string offsetName)
     {
-        return Swiftly.Core.GameData.GetOffset(offset);
+        return Swiftly.Core.GameData.GetOffset(offsetName);
     }
 }

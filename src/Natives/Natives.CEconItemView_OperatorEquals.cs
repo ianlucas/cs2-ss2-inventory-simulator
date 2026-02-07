@@ -14,7 +14,7 @@ public static partial class Natives
     private static readonly Lazy<
         IUnmanagedFunction<CEconItemView_OperatorEqualsDelegate>
     > _lazyEconItemViewOperatorEquals = new(() =>
-        FromSignature<CEconItemView_OperatorEqualsDelegate>("CEconItemView::operator=")
+        GetFunctionBySignature<CEconItemView_OperatorEqualsDelegate>("CEconItemView::operator=")
     );
 
     public static IUnmanagedFunction<CEconItemView_OperatorEqualsDelegate> CEconItemView_OperatorEquals =>

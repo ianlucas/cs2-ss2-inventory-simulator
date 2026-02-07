@@ -21,7 +21,7 @@ public static partial class Natives
     private static readonly Lazy<
         IUnmanagedFunction<CCSPlayer_ItemServices_GiveNamedItemDelegate>
     > _lazyGiveNamedItem = new(() =>
-        FromSignature<CCSPlayer_ItemServices_GiveNamedItemDelegate>(
+        GetFunctionBySignature<CCSPlayer_ItemServices_GiveNamedItemDelegate>(
             "CCSPlayer_ItemServices::GiveNamedItem"
         )
     );

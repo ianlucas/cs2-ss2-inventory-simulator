@@ -19,7 +19,9 @@ public static partial class Natives
     private static readonly Lazy<
         IUnmanagedFunction<CCSPlayerPawn_IsAbleToApplySprayDelegate>
     > _lazyIsAbleToApplySpray = new(() =>
-        FromSignature<CCSPlayerPawn_IsAbleToApplySprayDelegate>("CCSPlayerPawn::IsAbleToApplySpray")
+        GetFunctionBySignature<CCSPlayerPawn_IsAbleToApplySprayDelegate>(
+            "CCSPlayerPawn::IsAbleToApplySpray"
+        )
     );
 
     public static IUnmanagedFunction<CCSPlayerPawn_IsAbleToApplySprayDelegate> CCSPlayerPawn_IsAbleToApplySpray =>

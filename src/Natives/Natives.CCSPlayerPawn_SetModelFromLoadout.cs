@@ -14,7 +14,7 @@ public static partial class Natives
     private static readonly Lazy<
         IUnmanagedFunction<CCSPlayerPawn_SetModelFromLoadoutDelegate>
     > _lazySetModelFromLoadout = new(() =>
-        FromSignature<CCSPlayerPawn_SetModelFromLoadoutDelegate>(
+        GetFunctionBySignature<CCSPlayerPawn_SetModelFromLoadoutDelegate>(
             "CCSPlayerPawn::SetModelFromLoadout"
         )
     );

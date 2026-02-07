@@ -18,7 +18,7 @@ public static partial class Natives
     private static readonly Lazy<
         IUnmanagedFunction<CEconItemSchema_GetItemDefinitionDelegate>
     > _lazyGetItemDefinition = new(() =>
-        FromSignature<CEconItemSchema_GetItemDefinitionDelegate>(
+        GetFunctionBySignature<CEconItemSchema_GetItemDefinitionDelegate>(
             "CEconItemSchema::GetItemDefinition"
         )
     );
