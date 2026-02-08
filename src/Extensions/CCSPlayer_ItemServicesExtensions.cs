@@ -9,6 +9,15 @@ namespace InventorySimulator;
 
 public static class CCSPlayer_ItemServicesExtensions
 {
+    public static CCSPlayerController? GetController(this CCSPlayer_ItemServices self)
+    {
+        var pawn = self.Pawn;
+        return
+            pawn != null && pawn.IsValid && pawn.Controller.IsValid && pawn.Controller.Value != null
+            ? pawn.Controller.Value.As<CCSPlayerController>()
+            : null;
+    }
+
     public static void UpdateWearables(this CCSPlayer_ItemServices self)
     {
         Natives.CCSPlayer_ItemServices_SetWearables.Call(self.Address);

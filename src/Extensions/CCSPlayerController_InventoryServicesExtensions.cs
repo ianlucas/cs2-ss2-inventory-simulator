@@ -9,15 +9,6 @@ namespace InventorySimulator;
 
 public static class CCSPlayerController_InventoryServicesExtensions
 {
-    public static CCSPlayerController? GetController(this CCSPlayer_ItemServices self)
-    {
-        var pawn = self.Pawn;
-        return
-            pawn != null && pawn.IsValid && pawn.Controller.IsValid && pawn.Controller.Value != null
-            ? pawn.Controller.Value.As<CCSPlayerController>()
-            : null;
-    }
-
     public static CCSPlayerInventory GetInventory(this CCSPlayerController_InventoryServices self)
     {
         return new CCSPlayerInventory(
