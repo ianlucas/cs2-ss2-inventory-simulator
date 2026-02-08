@@ -18,12 +18,16 @@ public static class Inventories
     {
         try
         {
-            var path = Path.Combine(
-                Swiftly.Core.GameDirectory,
-                _inventoryFileDir,
-                ConVars.File.Value
-            );
-            if (!File.Exists(path))
+            var filename = ConVars.File.Value;
+            var candidates = new[]
+            {
+                Path.Combine(Swiftly.Core.GameDirectory, _inventoryFileDir, filename),
+                Path.Combine(Swiftly.Core.GameDirectory, "csgo", filename),
+            };
+            var path =
+                candidates.FirstOrDefault(File.Exists)
+                ?? (Path.IsPathRooted(filename) && File.Exists(filename) ? filename : null);
+            if (path == null)
                 return false;
             string json = File.ReadAllText(path);
             var inventories = JsonSerializer.Deserialize<Dictionary<ulong, PlayerInventory>>(json);
