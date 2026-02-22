@@ -38,18 +38,8 @@ public partial class InventorySimulator
     public void OnSprayCommand(ICommandContext context)
     {
         var player = context.Sender;
-        if (player != null && ConVars.IsSprayEnabled.Value)
-        {
-            var controllerState = player.Controller.GetState();
-            var cooldown = ConVars.SprayCooldown.Value;
-            var diff = DateTimeOffset.UtcNow.ToUnixTimeSeconds() - controllerState.SprayUsedAt;
-            if (diff < cooldown)
-            {
-                player.SendChat(Core.Localizer["invsim.spray_cooldown", cooldown - diff]);
-                return;
-            }
-            HandlePlayerGraffitiSpray(player);
-        }
+        if (player != null)
+            HandlePlayerSpray(player);
     }
 
     [Command("wslogin")]

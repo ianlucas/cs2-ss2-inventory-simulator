@@ -175,10 +175,25 @@ public partial class InventorySimulator
                     if (controllerState.IsUseCmdBlocked)
                         controllerState.IsUseCmdBlocked = false;
                     else if (player.IsValid && !player.IsUseCmdBusy())
-                        player.ExecuteCommand("css_spray");
+                        HandlePlayerSpray(player);
                 }
             );
         }
+    }
+
+    public void HandlePlayerSpray(IPlayer player)
+    {
+        if (!ConVars.IsSprayEnabled.Value)
+            return;
+        var controllerState = player.Controller.GetState();
+        var cooldown = ConVars.SprayCooldown.Value;
+        var diff = DateTimeOffset.UtcNow.ToUnixTimeSeconds() - controllerState.SprayUsedAt;
+        if (diff < cooldown)
+        {
+            player.SendChat(Core.Localizer["invsim.spray_cooldown", cooldown - diff]);
+            return;
+        }
+        HandlePlayerGraffitiSpray(player);
     }
 
     public unsafe void HandlePlayerGraffitiSpray(IPlayer player)
