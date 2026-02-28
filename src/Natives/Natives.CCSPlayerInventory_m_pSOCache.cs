@@ -7,6 +7,7 @@ namespace InventorySimulator;
 
 public static partial class Natives
 {
-    public static readonly int CCSPlayerInventory_m_pSOCache =
-        GetOffset("CCSPlayerInventory::m_pSOCache");
+    public static readonly int CCSPlayerInventory_m_pSOCache = GetOffset(
+        "CCSPlayerInventory::m_pSOCache"
+    );
 }

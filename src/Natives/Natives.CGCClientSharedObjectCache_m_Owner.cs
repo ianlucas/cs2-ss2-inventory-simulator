@@ -7,6 +7,7 @@ namespace InventorySimulator;
 
 public static partial class Natives
 {
-    public static readonly int CGCClientSharedObjectCache_m_Owner =
-        GetOffset("CGCClientSharedObjectCache::m_Owner");
+    public static readonly int CGCClientSharedObjectCache_m_Owner = GetOffset(
+        "CGCClientSharedObjectCache::m_Owner"
+    );
 }
