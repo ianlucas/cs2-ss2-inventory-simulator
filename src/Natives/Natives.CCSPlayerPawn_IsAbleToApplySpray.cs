@@ -16,14 +16,8 @@ public static partial class Natives
         nint eyePosOut
     );
 
-    private static readonly Lazy<
-        IUnmanagedFunction<CCSPlayerPawn_IsAbleToApplySprayDelegate>
-    > _lazyIsAbleToApplySpray = new(() =>
+    public static readonly IUnmanagedFunction<CCSPlayerPawn_IsAbleToApplySprayDelegate> CCSPlayerPawn_IsAbleToApplySpray =
         GetFunctionBySignature<CCSPlayerPawn_IsAbleToApplySprayDelegate>(
             "CCSPlayerPawn::IsAbleToApplySpray"
-        )
-    );
-
-    public static IUnmanagedFunction<CCSPlayerPawn_IsAbleToApplySprayDelegate> CCSPlayerPawn_IsAbleToApplySpray =>
-        _lazyIsAbleToApplySpray.Value;
+        );
 }

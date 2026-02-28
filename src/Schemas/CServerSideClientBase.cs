@@ -8,14 +8,10 @@ using SwiftlyS2.Shared.Natives;
 
 namespace InventorySimulator;
 
-// Thanks to @samyycX.
-public struct CGCClientSharedObjectCache(nint address) : INativeHandle
+public class CServerSideClientBase(nint address) : INativeHandle
 {
     public nint Address { get; set; } = address;
-    public readonly bool IsValid => Address != nint.Zero;
-
-    public readonly SOID_t Owner =>
-        !IsValid
-            ? throw new InvalidOperationException("Invalid cache.")
-            : Marshal.PtrToStructure<SOID_t>(Address + Natives.CGCClientSharedObjectCache_m_Owner);
+    public bool IsValid => Address != nint.Zero;
+    public ushort UserID =>
+        (ushort)Marshal.ReadInt16(Address + Natives.CServerSideClientBase_m_UserID);
 }

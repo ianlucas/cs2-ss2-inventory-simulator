@@ -13,7 +13,7 @@ namespace InventorySimulator;
 public class CEconItemDefinition(nint address) : INativeHandle
 {
     public nint Address { get; set; } = address;
-    public bool IsValid => Address != 0;
+    public bool IsValid => Address != nint.Zero;
 
     public ushort DefIndex => (ushort)Marshal.ReadInt16(Address + 0x10);
 
@@ -22,7 +22,7 @@ public class CEconItemDefinition(nint address) : INativeHandle
         get
         {
             var ptr = Marshal.ReadIntPtr(Address + 0x260);
-            return ptr != 0 ? Marshal.PtrToStringUTF8(ptr) : null;
+            return ptr != nint.Zero ? Marshal.PtrToStringUTF8(ptr) : null;
         }
     }
 

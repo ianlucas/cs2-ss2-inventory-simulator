@@ -13,7 +13,7 @@ namespace InventorySimulator;
 public class CCSPlayerInventory(nint address) : INativeHandle
 {
     public nint Address { get; set; } = address;
-    public bool IsValid => Address != 0 && SOCache.IsValid;
+    public bool IsValid => Address != nint.Zero && SOCache.IsValid;
     public ulong SteamID => SOCache.Owner.SteamID;
 
     public CGCClientSharedObjectCache SOCache =>

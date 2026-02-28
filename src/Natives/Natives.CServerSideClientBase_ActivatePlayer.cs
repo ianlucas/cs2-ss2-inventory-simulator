@@ -11,14 +11,8 @@ public static partial class Natives
 {
     public delegate void CServerSideClientBase_ActivatePlayerDelegate(nint thisPtr);
 
-    private static readonly Lazy<
-        IUnmanagedFunction<CServerSideClientBase_ActivatePlayerDelegate>
-    > _lazyActivatePlayer = new(() =>
+    public static readonly IUnmanagedFunction<CServerSideClientBase_ActivatePlayerDelegate> CServerSideClientBase_ActivatePlayer =
         GetFunctionBySignature<CServerSideClientBase_ActivatePlayerDelegate>(
             "CServerSideClientBase::ActivatePlayer"
-        )
-    );
-
-    public static IUnmanagedFunction<CServerSideClientBase_ActivatePlayerDelegate> CServerSideClientBase_ActivatePlayer =>
-        _lazyActivatePlayer.Value;
+        );
 }

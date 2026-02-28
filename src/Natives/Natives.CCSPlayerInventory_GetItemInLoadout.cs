@@ -15,14 +15,8 @@ public static partial class Natives
         int iSlot
     );
 
-    private static readonly Lazy<
-        IUnmanagedFunction<CCSPlayerInventory_GetItemInLoadoutDelegate>
-    > _lazyGetItemInLoadout = new(() =>
+    public static readonly IUnmanagedFunction<CCSPlayerInventory_GetItemInLoadoutDelegate> CCSPlayerInventory_GetItemInLoadout =
         GetFunctionBySignature<CCSPlayerInventory_GetItemInLoadoutDelegate>(
             "CCSPlayerInventory::GetItemInLoadout"
-        )
-    );
-
-    public static IUnmanagedFunction<CCSPlayerInventory_GetItemInLoadoutDelegate> CCSPlayerInventory_GetItemInLoadout =>
-        _lazyGetItemInLoadout.Value;
+        );
 }

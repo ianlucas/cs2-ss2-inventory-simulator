@@ -15,7 +15,7 @@ public static class SchemaHelper
     {
         var ptr = Marshal.AllocHGlobal(Helper.GetSchemaSize<CEconItemView>());
         Natives.CEconItemView_Constructor.Call(ptr);
-        if (copyFrom != 0)
+        if (copyFrom != nint.Zero)
             Natives.CEconItemView_OperatorEquals.Call(ptr, copyFrom);
         return Swiftly.Core.Memory.ToSchemaClass<CEconItemView>(ptr);
     }

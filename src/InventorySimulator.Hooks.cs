@@ -16,8 +16,7 @@ public partial class InventorySimulator
     {
         return (thisPtr) =>
         {
-            var userid = (ushort)
-                Marshal.ReadInt16(thisPtr + Natives.CServerSideClientBase_m_UserID);
+            var userid = new CServerSideClientBase(thisPtr).UserID;
             var player = Core.PlayerManager.GetPlayer(userid);
             if (player != null && !player.IsFakeClient && player.Controller != null)
             {

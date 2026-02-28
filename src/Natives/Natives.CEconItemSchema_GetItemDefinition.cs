@@ -15,14 +15,8 @@ public static partial class Natives
         byte flag
     );
 
-    private static readonly Lazy<
-        IUnmanagedFunction<CEconItemSchema_GetItemDefinitionDelegate>
-    > _lazyGetItemDefinition = new(() =>
+    public static readonly IUnmanagedFunction<CEconItemSchema_GetItemDefinitionDelegate> CEconItemSchema_GetItemDefinition =
         GetFunctionBySignature<CEconItemSchema_GetItemDefinitionDelegate>(
             "CEconItemSchema::GetItemDefinition"
-        )
-    );
-
-    public static IUnmanagedFunction<CEconItemSchema_GetItemDefinitionDelegate> CEconItemSchema_GetItemDefinition =>
-        _lazyGetItemDefinition.Value;
+        );
 }

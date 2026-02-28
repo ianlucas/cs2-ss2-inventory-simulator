@@ -7,9 +7,7 @@ namespace InventorySimulator;
 
 public static partial class Natives
 {
-    private static readonly Lazy<int> _lazyCServerSideClientBase_m_UserID = new(() =>
-        GetOffset("CServerSideClientBase::m_UserID")
+    public static readonly int CServerSideClientBase_m_UserID = GetOffset(
+        "CServerSideClientBase::m_UserID"
     );
-
-    public static int CServerSideClientBase_m_UserID => _lazyCServerSideClientBase_m_UserID.Value;
 }

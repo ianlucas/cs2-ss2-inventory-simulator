@@ -12,7 +12,7 @@ namespace InventorySimulator;
 public class CEconItemSchema(nint address) : INativeHandle
 {
     public nint Address { get; set; } = address;
-    public bool IsValid => Address != 0;
+    public bool IsValid => Address != nint.Zero;
 
     public unsafe CEconItemDefinition? GetItemDefinitionByName(string pchName)
     {

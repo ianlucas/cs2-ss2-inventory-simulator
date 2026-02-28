@@ -11,9 +11,6 @@ public static partial class Natives
 {
     public delegate nint GetItemSchemaDelegate();
 
-    private static readonly Lazy<IUnmanagedFunction<GetItemSchemaDelegate>> _lazyGetItemSchema =
-        new(() => GetFunctionBySignature<GetItemSchemaDelegate>("GetItemSchema"));
-
-    public static IUnmanagedFunction<GetItemSchemaDelegate> GetItemSchema =>
-        _lazyGetItemSchema.Value;
+    public static readonly IUnmanagedFunction<GetItemSchemaDelegate> GetItemSchema =
+        GetFunctionBySignature<GetItemSchemaDelegate>("GetItemSchema");
 }
