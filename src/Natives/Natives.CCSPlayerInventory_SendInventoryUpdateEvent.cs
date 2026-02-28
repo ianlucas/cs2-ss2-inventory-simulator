@@ -11,14 +11,8 @@ public static partial class Natives
 {
     public delegate nint CCSPlayerInventory_SendInventoryUpdateEventDelegate(nint thisPtr);
 
-    private static readonly Lazy<
-        IUnmanagedFunction<CCSPlayerInventory_SendInventoryUpdateEventDelegate>
-    > _lazyPlayerInventorySendInventoryUpdateEvent = new(() =>
+    public static readonly IUnmanagedFunction<CCSPlayerInventory_SendInventoryUpdateEventDelegate> CCSPlayerInventory_SendInventoryUpdateEvent =
         GetFunctionBySignature<CCSPlayerInventory_SendInventoryUpdateEventDelegate>(
             "CCSPlayerInventory::SendInventoryUpdateEvent"
-        )
-    );
-
-    public static IUnmanagedFunction<CCSPlayerInventory_SendInventoryUpdateEventDelegate> CCSPlayerInventory_SendInventoryUpdateEvent =>
-        _lazyPlayerInventorySendInventoryUpdateEvent.Value;
+        );
 }

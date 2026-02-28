@@ -14,14 +14,8 @@ public static partial class Natives
         nint pchName
     );
 
-    private static readonly Lazy<
-        IUnmanagedFunction<CEconItemSchema_GetItemDefinitionByNameDelegate>
-    > _lazyGetItemDefinitionByName = new(() =>
+    public static readonly IUnmanagedFunction<CEconItemSchema_GetItemDefinitionByNameDelegate> CEconItemSchema_GetItemDefinitionByName =
         GetFunctionBySignature<CEconItemSchema_GetItemDefinitionByNameDelegate>(
             "CEconItemSchema::GetItemDefinitionByName"
-        )
-    );
-
-    public static IUnmanagedFunction<CEconItemSchema_GetItemDefinitionByNameDelegate> CEconItemSchema_GetItemDefinitionByName =>
-        _lazyGetItemDefinitionByName.Value;
+        );
 }

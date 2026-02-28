@@ -11,14 +11,8 @@ public static partial class Natives
 {
     public delegate void CCSPlayerPawn_SetModelFromClassDelegate(nint thisPtr);
 
-    private static readonly Lazy<
-        IUnmanagedFunction<CCSPlayerPawn_SetModelFromClassDelegate>
-    > _lazyPlayerPawnSetModelFromClass = new(() =>
+    public static readonly IUnmanagedFunction<CCSPlayerPawn_SetModelFromClassDelegate> CCSPlayerPawn_SetModelFromClass =
         GetFunctionBySignature<CCSPlayerPawn_SetModelFromClassDelegate>(
             "CCSPlayerPawn::SetModelFromClass"
-        )
-    );
-
-    public static IUnmanagedFunction<CCSPlayerPawn_SetModelFromClassDelegate> CCSPlayerPawn_SetModelFromClass =>
-        _lazyPlayerPawnSetModelFromClass.Value;
+        );
 }

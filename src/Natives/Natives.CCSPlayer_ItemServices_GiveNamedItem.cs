@@ -18,14 +18,8 @@ public static partial class Natives
         nint position
     );
 
-    private static readonly Lazy<
-        IUnmanagedFunction<CCSPlayer_ItemServices_GiveNamedItemDelegate>
-    > _lazyGiveNamedItem = new(() =>
+    public static readonly IUnmanagedFunction<CCSPlayer_ItemServices_GiveNamedItemDelegate> CCSPlayer_ItemServices_GiveNamedItem =
         GetFunctionBySignature<CCSPlayer_ItemServices_GiveNamedItemDelegate>(
             "CCSPlayer_ItemServices::GiveNamedItem"
-        )
-    );
-
-    public static IUnmanagedFunction<CCSPlayer_ItemServices_GiveNamedItemDelegate> CCSPlayer_ItemServices_GiveNamedItem =>
-        _lazyGiveNamedItem.Value;
+        );
 }
