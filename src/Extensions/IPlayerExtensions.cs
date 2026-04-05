@@ -184,5 +184,11 @@ public static class IPlayerExtensions
                     );
             }
         }
+
+        public void HandleDisconnect()
+        {
+            if (!ConVars.IsPersistInventory.Value && !Inventories.Has(self.SteamID))
+                self.Controller.GetState().Inventory = null;
+        }
     }
 }
