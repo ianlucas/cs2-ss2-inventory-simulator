@@ -57,6 +57,12 @@ public static class ConVars
         false
     );
 
+    public static readonly IConVar<bool> IsPersistInventory = Swiftly.Core.ConVar.CreateOrFind(
+        "invsim_persist_inventory",
+        "Keep a player's cached inventory after they disconnect.",
+        false
+    );
+
     public static readonly IConVar<bool> IsRequireInventory = Swiftly.Core.ConVar.CreateOrFind(
         "invsim_require_inventory",
         "Require the player's inventory to be fetched before allowing them to join the game.",
@@ -115,6 +121,7 @@ public static class ConVars
         _ = WsCooldown;
         _ = WsUrlPrintFormat;
         _ = IsWsLogin;
+        _ = IsPersistInventory;
         _ = IsRequireInventory;
         _ = IsSprayEnabled;
         _ = IsSprayOnUse;

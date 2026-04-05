@@ -48,4 +48,12 @@ public partial class InventorySimulator
             HandlePlayerMusicKitStatTrakIncrement(@event, player);
         return HookResult.Continue;
     }
+
+    public HookResult OnPlayerDisconnect(EventPlayerDisconnect @event)
+    {
+        var player = @event.UserIdPlayer;
+        if (player != null && !player.IsFakeClient)
+            player.HandleDisconnect();
+        return HookResult.Continue;
+    }
 }
