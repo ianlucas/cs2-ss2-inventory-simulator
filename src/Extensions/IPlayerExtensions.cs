@@ -56,21 +56,13 @@ public static class IPlayerExtensions
             var oldItem = oldInventory?.GetGloves(teamNum, isFallbackTeam);
             if (oldItem == item)
                 return;
-            // Workaround by @daffyyyy.
-            var model = pawn.CBodyComponent?.SceneNode?.GetSkeletonInstance()?.ModelState.ModelName;
-            if (!string.IsNullOrEmpty(model))
-            {
-                pawn.SetModel("characters/models/tm_jumpsuit/tm_jumpsuit_varianta.vmdl");
-                pawn.SetModel(model);
-            }
+            itemServices.UpdateWearables();
+            // Thanks to @samyycX.
+            pawn.AcceptInput("SetBodygroup", "first_or_third_person,0");
             Swiftly.Core.Scheduler.NextWorldUpdate(() =>
             {
                 if (pawn.IsValid && itemServices.IsValid)
-                {
-                    itemServices.UpdateWearables();
-                    if (item != null)
-                        pawn.AcceptInput("SetBodygroup", "default_gloves,1");
-                }
+                    pawn.AcceptInput("SetBodygroup", "first_or_third_person,1");
             });
         }
 
