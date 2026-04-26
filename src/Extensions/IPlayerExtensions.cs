@@ -44,7 +44,12 @@ public static class IPlayerExtensions
             {
                 if (self.IsValid)
                 {
-                    self.SendChat(Swiftly.Core.Localizer["invsim.ws_completed"]);
+                    self.SendChat(
+                        Swiftly.Core.Localizer[
+                            "invsim.ws_completed",
+                            InventorySimulatorCtx.GetChatPrefix()
+                        ]
+                    );
                     self.HandleInventoryLoad();
                     self.HandlePostRefreshInventory(oldInventory);
                 }
@@ -290,14 +295,16 @@ public static class IPlayerExtensions
             controllerState.IsFetching = false;
             Swiftly.Core.Scheduler.NextWorldUpdate(() =>
             {
+                var prefix = InventorySimulatorCtx.GetChatPrefix();
                 if (response == null)
                 {
-                    self?.SendChat(Swiftly.Core.Localizer["invsim.login_failed"]);
+                    self?.SendChat(Swiftly.Core.Localizer["invsim.login_failed", prefix]);
                     return;
                 }
                 self?.SendChat(
                     Swiftly.Core.Localizer[
                         "invsim.login",
+                        prefix,
                         $"{Api.GetUrl("/api/sign-in/callback")}?token={response.Token}"
                     ]
                 );
@@ -313,7 +320,13 @@ public static class IPlayerExtensions
             var diff = DateTimeOffset.UtcNow.ToUnixTimeSeconds() - controllerState.SprayUsedAt;
             if (diff < cooldown)
             {
-                self.SendChat(Swiftly.Core.Localizer["invsim.spray_cooldown", cooldown - diff]);
+                self.SendChat(
+                    Swiftly.Core.Localizer[
+                        "invsim.spray_cooldown",
+                        InventorySimulatorCtx.GetChatPrefix(),
+                        cooldown - diff
+                    ]
+                );
                 return;
             }
             self.SprayGraffiti();
