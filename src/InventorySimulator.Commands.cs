@@ -30,7 +30,7 @@ public partial class InventorySimulator
             player.SendChat(Core.Localizer["invsim.ws_in_progress"]);
             return;
         }
-        HandlePlayerInventoryRefresh(player, true);
+        player.RefreshInventory(force: true);
         player.SendChat(Core.Localizer["invsim.ws_new"]);
     }
 
@@ -39,7 +39,7 @@ public partial class InventorySimulator
     {
         var player = context.Sender;
         if (player != null)
-            HandlePlayerSpray(player);
+            player.TrySprayGraffiti();
     }
 
     [Command("wslogin")]
@@ -52,7 +52,7 @@ public partial class InventorySimulator
             player.SendChat(Core.Localizer["invsim.login_in_progress"]);
             if (controllerState.IsAuthenticating)
                 return;
-            HandleSignIn(player);
+            player.SignIn();
         }
     }
 }
