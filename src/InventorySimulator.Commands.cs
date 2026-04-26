@@ -9,7 +9,10 @@ namespace InventorySimulator;
 
 public partial class InventorySimulator
 {
-    [Command("ws")]
+    [Command(
+        "ws",
+        helpText: "Refreshes player inventory from the Inventory Simulator service and displays the configured URL."
+    )]
     public void OnWSCommand(ICommandContext context)
     {
         var player = context.Sender;
@@ -34,7 +37,10 @@ public partial class InventorySimulator
         player.SendChat(Core.Localizer["invsim.ws_new"]);
     }
 
-    [Command("spray")]
+    [Command(
+        "spray",
+        helpText: "Applies the player's equipped graffiti spray at their current location."
+    )]
     public void OnSprayCommand(ICommandContext context)
     {
         var player = context.Sender;
@@ -42,7 +48,10 @@ public partial class InventorySimulator
             player.TrySprayGraffiti();
     }
 
-    [Command("wslogin")]
+    [Command(
+        "wslogin",
+        helpText: "Authenticates the player with Inventory Simulator and displays their login URL."
+    )]
     public void OnWsloginCommand(ICommandContext context)
     {
         var player = context.Sender;
