@@ -14,7 +14,7 @@ public partial class InventorySimulator
     {
         var player = @event.UserIdPlayer;
         if (player != null && !player.IsFakeClient)
-            HandlePlayerConnect(player);
+            player.HandleConnect();
         return HookResult.Continue;
     }
 
@@ -22,7 +22,7 @@ public partial class InventorySimulator
     {
         var player = @event.UserIdPlayer;
         if (player != null && !player.IsFakeClient)
-            HandlePlayerConnect(player);
+            player.HandleConnect();
         return HookResult.Continue;
     }
 
@@ -36,7 +36,7 @@ public partial class InventorySimulator
             var isVictimValid =
                 (!ConVars.IsStatTrakIgnoreBots.Value || !victim.IsFakeClient) && victim.IsValid;
             if (isAttackerValid && isVictimValid)
-                HandlePlayerWeaponStatTrakIncrement(attacker, @event.Weapon, @event.WeaponItemid);
+                attacker.IncrementWeaponStatTrak(@event.Weapon, @event.WeaponItemid);
         }
         return HookResult.Continue;
     }
@@ -45,7 +45,7 @@ public partial class InventorySimulator
     {
         var player = @event.UserIdPlayer;
         if (player != null && !player.IsFakeClient && player.IsValid)
-            HandlePlayerMusicKitStatTrakIncrement(@event, player);
+            player.IncrementMusicKitStatTrak(@event);
         return HookResult.Continue;
     }
 

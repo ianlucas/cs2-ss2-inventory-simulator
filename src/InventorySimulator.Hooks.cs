@@ -31,7 +31,7 @@ public partial class InventorySimulator
                                 Natives.CServerSideClientBase_ActivatePlayer.CallOriginal(thisPtr);
                         });
                     if (!controllerState.IsFetching)
-                        HandlePlayerInventoryRefresh(player);
+                        player.RefreshInventory();
                     return;
                 }
             }

@@ -6,7 +6,6 @@
 using SwiftlyS2.Shared;
 using SwiftlyS2.Shared.GameEventDefinitions;
 using SwiftlyS2.Shared.Plugins;
-using SwiftlyS2.Shared.Sounds;
 
 namespace InventorySimulator;
 
@@ -19,8 +18,6 @@ namespace InventorySimulator;
 )]
 public partial class InventorySimulator(ISwiftlyCore core) : BasePlugin(core)
 {
-    public readonly SoundEvent SprayCanShakeSound = new("SprayCan.Shake");
-    public readonly SoundEvent SprayCanPaintSound = new("SprayCan.Paint");
     public Guid? OnActivatePlayerHookGuid;
 
     public override void Load(bool hotReload)
@@ -38,8 +35,26 @@ public partial class InventorySimulator(ISwiftlyCore core) : BasePlugin(core)
         Core.GameEvent.HookPost<EventPlayerDisconnect>(OnPlayerDisconnect);
         Natives.CCSPlayer_ItemServices_GiveNamedItem.AddHook(OnGiveNamedItem);
         Natives.CCSPlayerInventory_GetItemInLoadout.AddHook(OnGetItemInLoadout);
-        HandleFileChanged();
-        HandleIsRequireInventoryChanged();
+        OnFileChanged();
+        OnIsRequireInventoryChanged();
+    }
+
+    public void OnFileChanged()
+    {
+        if (Inventories.Load())
+            foreach (var player in Core.PlayerManager.GetAllPlayers())
+                if (Inventories.TryGet(player.SteamID, out var inventory))
+                    player.Controller.GetState().Inventory = inventory;
+    }
+
+    public void OnIsRequireInventoryChanged()
+    {
+        if (ConVars.IsRequireInventory.Value)
+            OnActivatePlayerHookGuid = Natives.CServerSideClientBase_ActivatePlayer.AddHook(
+                OnActivatePlayer
+            );
+        else if (OnActivatePlayerHookGuid != null)
+            Natives.CServerSideClientBase_ActivatePlayer.RemoveHook(OnActivatePlayerHookGuid.Value);
     }
 
     public override void Unload()
