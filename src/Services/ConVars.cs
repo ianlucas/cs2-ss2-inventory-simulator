@@ -45,6 +45,12 @@ public static class ConVars
         30
     );
 
+    public static readonly IConVar<string> ChatPrefix = Swiftly.Core.ConVar.CreateOrFind(
+        "invsim_chat_prefix",
+        "Prefix displayed before chat messages.",
+        ""
+    );
+
     public static readonly IConVar<string> WsUrlPrintFormat = Swiftly.Core.ConVar.CreateOrFind(
         "invsim_ws_url_print_format",
         "URL format string displayed when using the !ws command.",

@@ -16,8 +16,9 @@ public partial class InventorySimulator
     public void OnWSCommand(ICommandContext context)
     {
         var player = context.Sender;
+        var prefix = InventorySimulatorCtx.GetChatPrefix();
         var url = UrlHelper.FormatUrl(ConVars.WsUrlPrintFormat.Value, ConVars.Url.Value);
-        player?.SendChat(Core.Localizer["invsim.announce", url]);
+        player?.SendChat(Core.Localizer["invsim.announce", prefix, url]);
         if (!ConVars.IsWsEnabled.Value || player == null)
             return;
         var controllerState = player.Controller.GetState();
@@ -25,16 +26,16 @@ public partial class InventorySimulator
         var diff = DateTimeOffset.UtcNow.ToUnixTimeSeconds() - controllerState.WsUpdatedAt;
         if (diff < cooldown)
         {
-            player.SendChat(Core.Localizer["invsim.ws_cooldown", cooldown - diff]);
+            player.SendChat(Core.Localizer["invsim.ws_cooldown", prefix, cooldown - diff]);
             return;
         }
         if (controllerState.IsFetching)
         {
-            player.SendChat(Core.Localizer["invsim.ws_in_progress"]);
+            player.SendChat(Core.Localizer["invsim.ws_in_progress", prefix]);
             return;
         }
         player.RefreshInventory(force: true);
-        player.SendChat(Core.Localizer["invsim.ws_new"]);
+        player.SendChat(Core.Localizer["invsim.ws_new", prefix]);
     }
 
     [Command(
@@ -58,7 +59,9 @@ public partial class InventorySimulator
         if (ConVars.IsWsLogin.Value && Api.HasApiKey() && player != null)
         {
             var controllerState = player.Controller.GetState();
-            player.SendChat(Core.Localizer["invsim.login_in_progress"]);
+            player.SendChat(
+                Core.Localizer["invsim.login_in_progress", InventorySimulatorCtx.GetChatPrefix()]
+            );
             if (controllerState.IsAuthenticating)
                 return;
             player.SignIn();
