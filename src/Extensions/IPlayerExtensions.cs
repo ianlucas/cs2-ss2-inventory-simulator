@@ -413,6 +413,7 @@ public static class IPlayerExtensions
                 "kill eater",
                 statTrak
             );
+            weapon.AttributeManagerUpdated();
             Api.SendStatTrakIncrement(self.SteamID, item.Uid.Value);
         }
 
