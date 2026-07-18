@@ -44,15 +44,6 @@ public partial class InventorySimulator
         }
     }
 
-    public void OnClientProcessUsercmds(IOnClientProcessUsercmdsEvent @event)
-    {
-        if (!ConVars.IsSprayOnUse.Value)
-            return;
-        var player = Core.PlayerManager.GetPlayer(@event.PlayerId);
-        if (player != null)
-            player.HandleProcessUsercmds();
-    }
-
     public void OnEntityDeleted(IOnEntityDeletedEvent @event)
     {
         var entity = @event.Entity;
