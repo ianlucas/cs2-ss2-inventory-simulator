@@ -12,7 +12,7 @@ namespace InventorySimulator;
 public static class Inventories
 {
     private static readonly Dictionary<ulong, PlayerInventory> _loadedInventories = [];
-    private static readonly string _inventoryFileDir = "csgo/addons/swiftlycs2/configs";
+    private static readonly string _inventoryFileDir = "csgo/addons/swiftlys2/configs";
 
     public static bool Load()
     {
