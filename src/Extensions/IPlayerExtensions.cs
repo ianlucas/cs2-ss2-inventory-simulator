@@ -31,7 +31,7 @@ public static class IPlayerExtensions
             if (!force)
             {
                 await self.FetchInventory();
-                Swiftly.Core.Scheduler.NextWorldUpdate(() =>
+                Runtime.Core.Scheduler.NextWorldUpdate(() =>
                 {
                     if (self.IsValid)
                         self.HandleInventoryLoad();
@@ -40,15 +40,12 @@ public static class IPlayerExtensions
             }
             var oldInventory = self.Controller.GetState().Inventory;
             await self.FetchInventory(force: true);
-            Swiftly.Core.Scheduler.NextWorldUpdate(() =>
+            Runtime.Core.Scheduler.NextWorldUpdate(() =>
             {
                 if (self.IsValid)
                 {
                     self.SendChat(
-                        Swiftly.Core.Localizer[
-                            "invsim.ws_completed",
-                            InventorySimulatorCtx.GetChatPrefix()
-                        ]
+                        Runtime.Core.Localizer["invsim.ws_completed", Rules.GetChatPrefix()]
                     );
                     self.HandleInventoryLoad();
                     self.HandlePostRefreshInventory(oldInventory);
@@ -121,7 +118,7 @@ public static class IPlayerExtensions
                 if (self.IsUseCmdBusy())
                     controllerState.IsUseCmdBlocked = true;
                 controllerState.DisposeUseCmdTimer();
-                controllerState.UseCmdTimer = Swiftly.Core.Scheduler.DelayBySeconds(
+                controllerState.UseCmdTimer = Runtime.Core.Scheduler.DelayBySeconds(
                     0.1f,
                     () =>
                     {
@@ -167,7 +164,7 @@ public static class IPlayerExtensions
             itemServices.UpdateWearables();
             // Thanks to @samyycX.
             pawn.AcceptInput("SetBodygroup", "first_or_third_person,0");
-            Swiftly.Core.Scheduler.NextWorldUpdate(() =>
+            Runtime.Core.Scheduler.NextWorldUpdate(() =>
             {
                 if (pawn.IsValid && itemServices.IsValid)
                     pawn.AcceptInput("SetBodygroup", "first_or_third_person,1");
@@ -254,7 +251,7 @@ public static class IPlayerExtensions
                     actualDesignerName
                 );
                 if (weapon != null)
-                    Swiftly.Core.Scheduler.Delay(
+                    Runtime.Core.Scheduler.Delay(
                         32,
                         () =>
                         {
@@ -264,7 +261,7 @@ public static class IPlayerExtensions
                                 weapon.Clip1Updated();
                                 weapon.ReserveAmmo[0] = reserve;
                                 weapon.ReserveAmmoUpdated();
-                                Swiftly.Core.Scheduler.NextWorldUpdate(() =>
+                                Runtime.Core.Scheduler.NextWorldUpdate(() =>
                                 {
                                     if (active && self.IsValid)
                                     {
@@ -293,16 +290,16 @@ public static class IPlayerExtensions
             controllerState.IsFetching = true;
             var response = await Api.SendSignIn(self.SteamID.ToString());
             controllerState.IsFetching = false;
-            Swiftly.Core.Scheduler.NextWorldUpdate(() =>
+            Runtime.Core.Scheduler.NextWorldUpdate(() =>
             {
-                var prefix = InventorySimulatorCtx.GetChatPrefix();
+                var prefix = Rules.GetChatPrefix();
                 if (response == null)
                 {
-                    self?.SendChat(Swiftly.Core.Localizer["invsim.login_failed", prefix]);
+                    self?.SendChat(Runtime.Core.Localizer["invsim.login_failed", prefix]);
                     return;
                 }
                 self?.SendChat(
-                    Swiftly.Core.Localizer[
+                    Runtime.Core.Localizer[
                         "invsim.login",
                         prefix,
                         $"{Api.GetUrl("/api/sign-in/callback")}?token={response.Token}"
@@ -321,9 +318,9 @@ public static class IPlayerExtensions
             if (diff < cooldown)
             {
                 self.SendChat(
-                    Swiftly.Core.Localizer[
+                    Runtime.Core.Localizer[
                         "invsim.spray_cooldown",
-                        InventorySimulatorCtx.GetChatPrefix(),
+                        Rules.GetChatPrefix(),
                         cooldown - diff
                     ]
                 );
@@ -353,7 +350,7 @@ public static class IPlayerExtensions
             _sprayCanShakeSound.Recipients.RemoveRecipient(self.PlayerID);
             self.Controller.GetState().SprayUsedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             var sprayDecal =
-                Swiftly.Core.EntitySystem.CreateEntityByDesignerName<CPlayerSprayDecal>(
+                Runtime.Core.EntitySystem.CreateEntityByDesignerName<CPlayerSprayDecal>(
                     "player_spray_decal"
                 );
             if (sprayDecal != null)
@@ -380,15 +377,15 @@ public static class IPlayerExtensions
             item.Charges -= 1;
             if (item.Uid != null)
                 Api.SendConsumeItemSpray(self.SteamID, item.Uid.Value);
-            var prefix = InventorySimulatorCtx.GetChatPrefix();
+            var prefix = Rules.GetChatPrefix();
             if (item.Charges <= 0)
             {
                 self.Controller.GetState().Inventory?.ClearGraffiti();
-                self.SendChat(Swiftly.Core.Localizer["invsim.spray_charges_empty", prefix]);
+                self.SendChat(Runtime.Core.Localizer["invsim.spray_charges_empty", prefix]);
             }
             else
                 self.SendChat(
-                    Swiftly.Core.Localizer["invsim.spray_charges", prefix, item.Charges.Value]
+                    Runtime.Core.Localizer["invsim.spray_charges", prefix, item.Charges.Value]
                 );
         }
 

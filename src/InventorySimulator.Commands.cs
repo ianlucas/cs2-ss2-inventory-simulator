@@ -16,7 +16,7 @@ public partial class InventorySimulator
     public void OnWSCommand(ICommandContext context)
     {
         var player = context.Sender;
-        var prefix = InventorySimulatorCtx.GetChatPrefix();
+        var prefix = Rules.GetChatPrefix();
         var url = UrlHelper.FormatUrl(ConVars.WsUrlPrintFormat.Value, ConVars.Url.Value);
         player?.SendChat(Core.Localizer["invsim.announce", prefix, url]);
         if (!ConVars.IsWsEnabled.Value || player == null)
@@ -59,9 +59,7 @@ public partial class InventorySimulator
         if (ConVars.IsWsLogin.Value && Api.HasApiKey() && player != null)
         {
             var controllerState = player.Controller.GetState();
-            player.SendChat(
-                Core.Localizer["invsim.login_in_progress", InventorySimulatorCtx.GetChatPrefix()]
-            );
+            player.SendChat(Core.Localizer["invsim.login_in_progress", Rules.GetChatPrefix()]);
             if (controllerState.IsAuthenticating)
                 return;
             player.SignIn();

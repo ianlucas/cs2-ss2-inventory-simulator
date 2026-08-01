@@ -3,17 +3,17 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+using SwiftlyS2.Shared;
+
 namespace InventorySimulator;
 
-public static class InventorySimulatorCtx
+public static class Runtime
 {
-    public static string GetChatPrefix(bool stripColors = false)
+    [SwiftlyInject]
+    public static ISwiftlyCore Core { get; set; } = null!;
+
+    public static void Initialize()
     {
-        var prefix = ConVars.ChatPrefix.Value;
-        if (prefix != "")
-            return $"{(stripColors
-            ? prefix.StripColors()
-            : prefix.ApplyColors())} ";
-        return "";
+        _ = Core;
     }
 }

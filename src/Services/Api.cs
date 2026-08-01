@@ -89,7 +89,7 @@ public class Api
             {
                 if (suspendOnUnauthorized)
                     _isSuspended = true;
-                Swiftly.Core.Logger.LogError(
+                Runtime.Core.Logger.LogError(
                     "POST {Url} failed, check your invsim_apikey's value.",
                     url
                 );
@@ -97,7 +97,7 @@ public class Api
             }
             if (!response.IsSuccessStatusCode)
             {
-                Swiftly.Core.Logger.LogError(
+                Runtime.Core.Logger.LogError(
                     "POST {Url} failed with status code: {StatusCode}",
                     url,
                     response.StatusCode
@@ -108,7 +108,7 @@ public class Api
         }
         catch (Exception error)
         {
-            Swiftly.Core.Logger.LogError("POST {Url} failed: {Message}", url, error.Message);
+            Runtime.Core.Logger.LogError("POST {Url} failed: {Message}", url, error.Message);
             return null;
         }
     }
@@ -163,7 +163,7 @@ public class Api
             }
             catch (Exception error)
             {
-                Swiftly.Core.Logger.LogError(
+                Runtime.Core.Logger.LogError(
                     "GET {Url} failed (attempt {Attempt}/{MaxRetries}): {Message}",
                     url,
                     attempt,

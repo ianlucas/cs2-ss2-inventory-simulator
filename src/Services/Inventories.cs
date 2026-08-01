@@ -21,8 +21,8 @@ public static class Inventories
             var filename = ConVars.File.Value;
             var candidates = new[]
             {
-                Path.Combine(Swiftly.Core.GameDirectory, _inventoryFileDir, filename),
-                Path.Combine(Swiftly.Core.GameDirectory, "csgo", filename),
+                Path.Combine(Runtime.Core.GameDirectory, _inventoryFileDir, filename),
+                Path.Combine(Runtime.Core.GameDirectory, "csgo", filename),
             };
             var path =
                 candidates.FirstOrDefault(File.Exists)
@@ -39,7 +39,7 @@ public static class Inventories
         }
         catch
         {
-            Swiftly.Core.Logger.LogError("Error when processing \"{File}\".", ConVars.File.Value);
+            Runtime.Core.Logger.LogError("Error when processing \"{File}\".", ConVars.File.Value);
             return false;
         }
     }

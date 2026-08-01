@@ -17,7 +17,7 @@ public static class SchemaHelper
         Natives.CEconItemView_Constructor.Call(ptr);
         if (copyFrom != nint.Zero)
             Natives.CEconItemView_OperatorEquals.Call(ptr, copyFrom);
-        return Swiftly.Core.Memory.ToSchemaClass<CEconItemView>(ptr);
+        return Runtime.Core.Memory.ToSchemaClass<CEconItemView>(ptr);
     }
 
     public static CEconItemSchema? GetItemSchema()

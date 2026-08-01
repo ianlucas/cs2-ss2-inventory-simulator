@@ -48,7 +48,7 @@ public class CCSPlayerControllerState(ulong steamId)
         var key = (SteamID, team, slot);
         if (_econItemViewManager.TryGetValue(key, out var ptr))
         {
-            var existingItemView = Swiftly.Core.Memory.ToSchemaClass<CEconItemView>(ptr);
+            var existingItemView = Runtime.Core.Memory.ToSchemaClass<CEconItemView>(ptr);
             existingItemView.ApplyAttributes(item, (loadout_slot_t)slot, SteamID);
             return ptr;
         }
