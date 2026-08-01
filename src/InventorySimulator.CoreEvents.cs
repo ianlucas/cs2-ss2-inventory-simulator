@@ -20,6 +20,14 @@ public partial class InventorySimulator
             case "invsim_require_inventory":
                 OnIsRequireInventoryChanged();
                 return;
+            case "invsim_url":
+                OnUrlChanged(@event.OldValue, @event.NewValue);
+                return;
+            case "invsim_apikey":
+            case "invsim_public_api_stattrak_increment":
+            case "invsim_public_api_spray_consume":
+                Api.ResetSuspension();
+                return;
         }
     }
 

@@ -99,6 +99,19 @@ public static class ConVars
         false
     );
 
+    public static readonly IConVar<bool> IsPublicApiStatTrakIncrement =
+        Swiftly.Core.ConVar.CreateOrFind(
+            "invsim_public_api_stattrak_increment",
+            "Send keyless StatTrak increment requests to the public API when invsim_apikey is not set.",
+            true
+        );
+
+    public static readonly IConVar<bool> IsPublicApiSprayConsume = Swiftly.Core.ConVar.CreateOrFind(
+        "invsim_public_api_spray_consume",
+        "Send keyless graffiti consume requests to the public API when invsim_apikey is not set.",
+        true
+    );
+
     public static readonly IConVar<bool> IsStatTrakIgnoreBots = Swiftly.Core.ConVar.CreateOrFind(
         "invsim_stattrak_ignore_bots",
         "Ignore StatTrak kill count increments for bot kills.",
@@ -133,6 +146,8 @@ public static class ConVars
         _ = IsSprayOnUse;
         _ = SprayCooldown;
         _ = IsSprayChangerEnabled;
+        _ = IsPublicApiStatTrakIncrement;
+        _ = IsPublicApiSprayConsume;
         _ = IsStatTrakIgnoreBots;
         _ = IsFallbackTeam;
         _ = MinModels;

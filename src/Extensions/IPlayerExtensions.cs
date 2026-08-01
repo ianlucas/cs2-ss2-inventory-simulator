@@ -369,7 +369,27 @@ public static class IPlayerExtensions
                 _sprayCanPaintSound.Recipients.AddRecipient(self.PlayerID);
                 _sprayCanPaintSound.Emit();
                 _sprayCanPaintSound.Recipients.RemoveRecipient(self.PlayerID);
+                self.ConsumeGraffitiCharge(item);
             }
+        }
+
+        public void ConsumeGraffitiCharge(InventoryItem item)
+        {
+            if (item.Charges == null)
+                return;
+            item.Charges -= 1;
+            if (item.Uid != null)
+                Api.SendConsumeItemSpray(self.SteamID, item.Uid.Value);
+            var prefix = InventorySimulatorCtx.GetChatPrefix();
+            if (item.Charges <= 0)
+            {
+                self.Controller.GetState().Inventory?.ClearGraffiti();
+                self.SendChat(Swiftly.Core.Localizer["invsim.spray_charges_empty", prefix]);
+            }
+            else
+                self.SendChat(
+                    Swiftly.Core.Localizer["invsim.spray_charges", prefix, item.Charges.Value]
+                );
         }
 
         public void HandleSprayDecalCreated(CPlayerSprayDecal sprayDecal)
