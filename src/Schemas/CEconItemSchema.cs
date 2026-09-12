@@ -14,6 +14,8 @@ public class CEconItemSchema(nint address) : INativeHandle
     public nint Address { get; set; } = address;
     public bool IsValid => Address != nint.Zero;
 
+    public void DangerouslySetAddress(nint address) => Address = address;
+
     public unsafe CEconItemDefinition? GetItemDefinitionByName(string pchName)
     {
         var pool = ArrayPool<byte>.Shared;

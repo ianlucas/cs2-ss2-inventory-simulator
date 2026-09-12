@@ -12,6 +12,9 @@ public class CServerSideClientBase(nint address) : INativeHandle
 {
     public nint Address { get; set; } = address;
     public bool IsValid => Address != nint.Zero;
+
+    public void DangerouslySetAddress(nint address) => Address = address;
+
     public ushort UserID =>
         (ushort)Marshal.ReadInt16(Address + Natives.CServerSideClientBase_m_UserID);
 }

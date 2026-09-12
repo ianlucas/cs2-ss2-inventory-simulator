@@ -14,6 +14,9 @@ public class CCSPlayerInventory(nint address) : INativeHandle
 {
     public nint Address { get; set; } = address;
     public bool IsValid => Address != nint.Zero && SOCache.IsValid;
+
+    public void DangerouslySetAddress(nint address) => Address = address;
+
     public ulong SteamID => SOCache.Owner.SteamID;
 
     public CGCClientSharedObjectCache SOCache =>

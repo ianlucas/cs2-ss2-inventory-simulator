@@ -14,6 +14,8 @@ public struct CGCClientSharedObjectCache(nint address) : INativeHandle
     public nint Address { get; set; } = address;
     public readonly bool IsValid => Address != nint.Zero;
 
+    public void DangerouslySetAddress(nint address) => Address = address;
+
     public readonly SOID_t Owner =>
         !IsValid
             ? throw new InvalidOperationException("Invalid cache.")

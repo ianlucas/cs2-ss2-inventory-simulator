@@ -14,7 +14,7 @@
   <ItemGroup>
     <PackageReference
       Include="SwiftlyS2.CS2"
-      Version="1.4.0"
+      Version="1.4.10"
       ExcludeAssets="runtime"
       PrivateAssets="all"
     />
