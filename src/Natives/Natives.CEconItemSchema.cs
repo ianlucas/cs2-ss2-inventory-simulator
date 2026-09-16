@@ -19,4 +19,14 @@ public static partial class Natives
         GetFunctionBySignature<CEconItemSchema_GetItemDefinitionDelegate>(
             "CEconItemSchema::GetItemDefinition"
         );
+
+    public delegate nint CEconItemSchema_GetItemDefinitionByNameDelegate(
+        nint thisPtr,
+        nint pchName
+    );
+
+    public static readonly IUnmanagedFunction<CEconItemSchema_GetItemDefinitionByNameDelegate> CEconItemSchema_GetItemDefinitionByName =
+        GetFunctionBySignature<CEconItemSchema_GetItemDefinitionByNameDelegate>(
+            "CEconItemSchema::GetItemDefinitionByName"
+        );
 }

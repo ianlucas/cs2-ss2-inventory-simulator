@@ -13,4 +13,9 @@ public static partial class Natives
 
     public static readonly IUnmanagedFunction<CEconItemView_ConstructorDelegate> CEconItemView_Constructor =
         GetFunctionBySignature<CEconItemView_ConstructorDelegate>("CEconItemView::CEconItemView");
+
+    public delegate nint CEconItemView_OperatorEqualsDelegate(nint thisPtr, nint other);
+
+    public static readonly IUnmanagedFunction<CEconItemView_OperatorEqualsDelegate> CEconItemView_OperatorEquals =
+        GetFunctionBySignature<CEconItemView_OperatorEqualsDelegate>("CEconItemView::operator=");
 }

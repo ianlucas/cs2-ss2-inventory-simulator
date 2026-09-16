@@ -9,6 +9,20 @@ namespace InventorySimulator;
 
 public static partial class Natives
 {
+    public delegate nint CCSPlayer_ItemServices_GiveNamedItemDelegate(
+        nint thisPtr,
+        nint pchName,
+        int subType,
+        nint itemDef,
+        byte forceGive,
+        nint position
+    );
+
+    public static readonly IUnmanagedFunction<CCSPlayer_ItemServices_GiveNamedItemDelegate> CCSPlayer_ItemServices_GiveNamedItem =
+        GetFunctionBySignature<CCSPlayer_ItemServices_GiveNamedItemDelegate>(
+            "CCSPlayer_ItemServices::GiveNamedItem"
+        );
+
     public delegate void CCSPlayer_ItemServices_SetWearablesDelegate(nint thisPtr);
 
     public static readonly IUnmanagedFunction<CCSPlayer_ItemServices_SetWearablesDelegate> CCSPlayer_ItemServices_SetWearables =

@@ -19,4 +19,15 @@ public static partial class Natives
         GetFunctionBySignature<CCSPlayerInventory_GetItemInLoadoutDelegate>(
             "CCSPlayerInventory::GetItemInLoadout"
         );
+
+    public delegate nint CCSPlayerInventory_SendInventoryUpdateEventDelegate(nint thisPtr);
+
+    public static readonly IUnmanagedFunction<CCSPlayerInventory_SendInventoryUpdateEventDelegate> CCSPlayerInventory_SendInventoryUpdateEvent =
+        GetFunctionBySignature<CCSPlayerInventory_SendInventoryUpdateEventDelegate>(
+            "CCSPlayerInventory::SendInventoryUpdateEvent"
+        );
+
+    public static readonly int CCSPlayerInventory_m_pSOCache = GetOffset(
+        "CCSPlayerInventory::m_pSOCache"
+    );
 }

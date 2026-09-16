@@ -15,4 +15,8 @@ public static partial class Natives
         GetFunctionBySignature<CServerSideClientBase_ActivatePlayerDelegate>(
             "CServerSideClientBase::ActivatePlayer"
         );
+
+    public static readonly int CServerSideClientBase_m_UserID = GetOffset(
+        "CServerSideClientBase::m_UserID"
+    );
 }
