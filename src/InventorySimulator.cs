@@ -18,8 +18,6 @@ namespace InventorySimulator;
 )]
 public partial class InventorySimulator(ISwiftlyCore core) : BasePlugin(core)
 {
-    public Guid? OnActivatePlayerHookGuid;
-
     public override void Load(bool hotReload)
     {
         Runtime.Initialize();
@@ -27,17 +25,26 @@ public partial class InventorySimulator(ISwiftlyCore core) : BasePlugin(core)
         Core.Event.OnEntityCreated += OnEntityCreated;
         Core.Event.OnEntityDeleted += OnEntityDeleted;
         Core.Event.OnConVarValueChanged += OnConVarValueChanged;
-        Core.GameHooks.Controller.ProcessUsercmds.Pre += OnProcessUsercmdsPre;
         Core.GameEvent.HookPost<EventPlayerConnect>(OnPlayerConnect);
         Core.GameEvent.HookPost<EventPlayerConnectFull>(OnPlayerConnectFull);
         Core.GameEvent.HookPre<EventPlayerDeath>(OnPlayerDeathPre);
         Core.GameEvent.HookPre<EventRoundMvp>(OnRoundMvpPre);
         Core.GameEvent.HookPost<EventPlayerDisconnect>(OnPlayerDisconnect);
-        Natives.CCSPlayer_ItemServices_GiveNamedItem.AddHook(OnGiveNamedItem);
-        Natives.CCSPlayerInventory_GetItemInLoadout.AddHook(OnGetItemInLoadout);
+        _giveNamedItemHookGuid = Natives.CCSPlayer_ItemServices_GiveNamedItem.AddHook(
+            OnGiveNamedItem
+        );
+        _getItemInLoadoutHookGuid = Natives.CCSPlayerInventory_GetItemInLoadout.AddHook(
+            OnGetItemInLoadout
+        );
         OnFileChanged();
-        OnIsRequireInventoryChanged();
+        OnIsRequireInventoryChanged(ConVars.IsRequireInventory.Value);
+        OnIsSprayOnUseChanged(ConVars.IsSprayOnUse.Value);
     }
+
+    private Guid _giveNamedItemHookGuid;
+    private Guid _getItemInLoadoutHookGuid;
+    private Guid? _activatePlayerHookGuid;
+    private bool _isProcessUsercmdsHooked = false;
 
     public void OnFileChanged()
     {
@@ -62,18 +69,38 @@ public partial class InventorySimulator(ISwiftlyCore core) : BasePlugin(core)
         }
     }
 
-    public void OnIsRequireInventoryChanged()
+    public void OnIsRequireInventoryChanged(bool value)
     {
-        if (ConVars.IsRequireInventory.Value)
-            OnActivatePlayerHookGuid = Natives.CServerSideClientBase_ActivatePlayer.AddHook(
+        if (value == (_activatePlayerHookGuid != null))
+            return;
+        if (value)
+            _activatePlayerHookGuid = Natives.CServerSideClientBase_ActivatePlayer.AddHook(
                 OnActivatePlayer
             );
-        else if (OnActivatePlayerHookGuid != null)
-            Natives.CServerSideClientBase_ActivatePlayer.RemoveHook(OnActivatePlayerHookGuid.Value);
+        else
+        {
+            Natives.CServerSideClientBase_ActivatePlayer.RemoveHook(_activatePlayerHookGuid!.Value);
+            _activatePlayerHookGuid = null;
+        }
+    }
+
+    public void OnIsSprayOnUseChanged(bool value)
+    {
+        if (value == _isProcessUsercmdsHooked)
+            return;
+        if (value)
+            Core.GameHooks.Controller.ProcessUsercmds.Pre += OnProcessUsercmdsPre;
+        else
+            Core.GameHooks.Controller.ProcessUsercmds.Pre -= OnProcessUsercmdsPre;
+        _isProcessUsercmdsHooked = value;
     }
 
     public override void Unload()
     {
+        Natives.CCSPlayer_ItemServices_GiveNamedItem.RemoveHook(_giveNamedItemHookGuid);
+        Natives.CCSPlayerInventory_GetItemInLoadout.RemoveHook(_getItemInLoadoutHookGuid);
+        OnIsRequireInventoryChanged(false);
+        OnIsSprayOnUseChanged(false);
         CCSPlayerControllerState.ClearAllEconItemView();
     }
 }

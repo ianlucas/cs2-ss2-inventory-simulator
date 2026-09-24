@@ -18,7 +18,10 @@ public partial class InventorySimulator
                 OnFileChanged();
                 return;
             case "invsim_require_inventory":
-                OnIsRequireInventoryChanged();
+                OnIsRequireInventoryChanged(ConVars.IsRequireInventory.Value);
+                return;
+            case "invsim_spray_on_use":
+                OnIsSprayOnUseChanged(ConVars.IsSprayOnUse.Value);
                 return;
             case "invsim_url":
                 OnUrlChanged(@event.OldValue, @event.NewValue);
