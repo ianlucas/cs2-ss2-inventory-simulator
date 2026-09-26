@@ -23,4 +23,19 @@ public static class CCSPlayerPawnExtensions
     {
         Natives.CCSPlayerPawn_SetModelFromClass.Call(self.Address);
     }
+
+    public static void RefreshGloves(this CCSPlayerPawn self, bool hasGloves)
+    {
+        self.AcceptInput("SetBodygroup", "first_or_third_person,0");
+        Runtime.Core.Scheduler.NextWorldUpdate(() =>
+        {
+            if (!self.IsValid)
+                return;
+            self.ItemServices?.UpdateWearables();
+            if (!hasGloves)
+                return;
+            self.EconGlovesChanged++;
+            self.EconGlovesChangedUpdated();
+        });
+    }
 }

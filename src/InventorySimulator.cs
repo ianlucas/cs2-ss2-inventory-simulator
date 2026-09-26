@@ -27,6 +27,7 @@ public partial class InventorySimulator(ISwiftlyCore core) : BasePlugin(core)
         Core.Event.OnConVarValueChanged += OnConVarValueChanged;
         Core.GameEvent.HookPost<EventPlayerConnect>(OnPlayerConnect);
         Core.GameEvent.HookPost<EventPlayerConnectFull>(OnPlayerConnectFull);
+        Core.GameEvent.HookPost<EventPlayerSpawn>(OnPlayerSpawn);
         Core.GameEvent.HookPre<EventPlayerDeath>(OnPlayerDeathPre);
         Core.GameEvent.HookPre<EventRoundMvp>(OnRoundMvpPre);
         Core.GameEvent.HookPost<EventPlayerDisconnect>(OnPlayerDisconnect);
