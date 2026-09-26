@@ -94,6 +94,19 @@ public static class IPlayerExtensions
             }
         }
 
+        public void HandleSpawn()
+        {
+            Runtime.Core.Scheduler.NextWorldUpdate(() =>
+            {
+                if (!self.IsValid)
+                    return;
+                var gloves = self
+                    .Controller.GetState()
+                    .Inventory?.GetGloves(self.Controller.TeamNum, ConVars.IsFallbackTeam.Value);
+                self.PlayerPawn?.RefreshGloves(gloves != null);
+            });
+        }
+
         public bool IsUseCmdBusy()
         {
             if (self.PlayerPawn?.IsBuyMenuOpen == true)
@@ -146,14 +159,16 @@ public static class IPlayerExtensions
                 return;
             pawn.SetModelFromLoadout();
             pawn.SetModelFromClass();
-            pawn.AcceptInput("SetBodygroup", "default_gloves,1");
+            var itemServices = pawn.ItemServices;
+            if (itemServices != null)
+                pawn.AcceptInput("SetBodygroup", $"defusekit,{(itemServices.HasDefuser ? 1 : 0)}");
+            pawn.RefreshGloves(inventory.GetGloves(teamNum, ConVars.IsFallbackTeam.Value) != null);
         }
 
         public void RegiveGloves(PlayerInventory inventory, PlayerInventory? oldInventory)
         {
             var pawn = self.PlayerPawn;
-            var itemServices = pawn?.ItemServices;
-            if (pawn == null || itemServices == null)
+            if (pawn == null || pawn.ItemServices == null)
                 return;
             var isFallbackTeam = ConVars.IsFallbackTeam.Value;
             var teamNum = self.Controller.TeamNum;
@@ -161,14 +176,7 @@ public static class IPlayerExtensions
             var oldItem = oldInventory?.GetGloves(teamNum, isFallbackTeam);
             if (oldItem == item)
                 return;
-            itemServices.UpdateWearables();
-            // Thanks to @samyycX.
-            pawn.AcceptInput("SetBodygroup", "first_or_third_person,0");
-            Runtime.Core.Scheduler.NextWorldUpdate(() =>
-            {
-                if (pawn.IsValid && itemServices.IsValid)
-                    pawn.AcceptInput("SetBodygroup", "first_or_third_person,1");
-            });
+            pawn.RefreshGloves(item != null);
         }
 
         public void RegiveWeapons(PlayerInventory inventory, PlayerInventory? oldInventory)

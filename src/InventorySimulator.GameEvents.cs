@@ -26,6 +26,14 @@ public partial class InventorySimulator
         return HookResult.Continue;
     }
 
+    public HookResult OnPlayerSpawn(EventPlayerSpawn @event)
+    {
+        var player = @event.UserIdPlayer;
+        if (player != null && !player.IsFakeClient)
+            player.HandleSpawn();
+        return HookResult.Continue;
+    }
+
     public HookResult OnPlayerDeathPre(EventPlayerDeath @event)
     {
         var attacker = Core.PlayerManager.GetPlayer(@event.Attacker);
