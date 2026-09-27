@@ -15,6 +15,9 @@ public static class CCSPlayerControllerExtensions
         CCSPlayerControllerState
     > _controllerStateManager = [];
 
+    public static IEnumerable<CCSPlayerControllerState> GetAllStates() =>
+        _controllerStateManager.Values;
+
     extension(CCSPlayerController self)
     {
         public CCSPlayerControllerState GetState()

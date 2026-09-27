@@ -56,7 +56,6 @@ public static class IPlayerExtensions
         public async Task FetchInventory(bool force = false)
         {
             var controllerState = self.Controller.GetState();
-            var existing = controllerState.Inventory;
             if (!force && controllerState.Inventory != null)
                 return;
             if (controllerState.IsFetching)
@@ -66,8 +65,6 @@ public static class IPlayerExtensions
             if (response != null)
             {
                 var inventory = new PlayerInventory(response);
-                if (existing != null)
-                    inventory.WeaponWearCache = existing.WeaponWearCache;
                 inventory.InitializeWearOverrides();
                 controllerState.WsUpdatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
                 controllerState.Inventory = inventory;

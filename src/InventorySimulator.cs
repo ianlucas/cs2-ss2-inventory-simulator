@@ -25,6 +25,7 @@ public partial class InventorySimulator(ISwiftlyCore core) : BasePlugin(core)
         Core.Event.OnEntityCreated += OnEntityCreated;
         Core.Event.OnEntityDeleted += OnEntityDeleted;
         Core.Event.OnConVarValueChanged += OnConVarValueChanged;
+        Core.Event.OnMapLoad += OnMapLoad;
         Core.GameEvent.HookPost<EventPlayerConnect>(OnPlayerConnect);
         Core.GameEvent.HookPost<EventPlayerConnectFull>(OnPlayerConnectFull);
         Core.GameEvent.HookPost<EventPlayerSpawn>(OnPlayerSpawn);
@@ -80,7 +81,10 @@ public partial class InventorySimulator(ISwiftlyCore core) : BasePlugin(core)
             );
         else
         {
-            Natives.CServerSideClientBase_ActivatePlayer.RemoveHook(_activatePlayerHookGuid!.Value);
+            Natives.CServerSideClientBase_ActivatePlayer.RemoveHook(
+                _activatePlayerHookGuid
+                    ?? throw new InvalidOperationException("ActivatePlayer hook not installed.")
+            );
             _activatePlayerHookGuid = null;
         }
     }

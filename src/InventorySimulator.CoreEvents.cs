@@ -34,6 +34,17 @@ public partial class InventorySimulator
         }
     }
 
+    public void OnMapLoad(IOnMapLoadEvent @event)
+    {
+        // Clients clear their skin material cache on map change. Inventories that outlived the old
+        // map keep their wears claimed, the others get new ones when they're fetched again.
+        WearRegistry.Reset(
+            CCSPlayerControllerExtensions
+                .GetAllStates()
+                .SelectMany(state => state.Inventory?.GetAllWeapons() ?? [])
+        );
+    }
+
     public void OnEntityCreated(IOnEntityCreatedEvent @event)
     {
         var entity = @event.Entity;
