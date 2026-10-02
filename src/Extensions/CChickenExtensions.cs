@@ -27,9 +27,10 @@ public static class CChickenExtensions
     {
         if (item.Model == null)
             return false;
+        var model = $"{item.Model}.vmdl";
         Natives.CEconItemView_OperatorEquals.Call(self.AttributeManager.Item.Address, itemView);
-        if (!string.Equals(self.GetModel(), item.Model, StringComparison.OrdinalIgnoreCase))
-            self.SetModel(item.Model);
+        if (!string.Equals(self.GetModel(), model, StringComparison.OrdinalIgnoreCase))
+            self.SetModel(model);
         self.ApplyPetStyle(item);
         return true;
     }
