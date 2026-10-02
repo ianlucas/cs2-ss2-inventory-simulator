@@ -190,6 +190,8 @@ public static class IPlayerExtensions
 
         public void RegivePet(PlayerInventory inventory, PlayerInventory? oldInventory)
         {
+            if (!ConVars.IsPetEnabled.Value)
+                return;
             var item = inventory.Pet;
             if (oldInventory?.Pet == item)
                 return;

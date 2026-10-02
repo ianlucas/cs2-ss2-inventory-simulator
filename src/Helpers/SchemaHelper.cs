@@ -11,6 +11,27 @@ namespace InventorySimulator;
 
 public static class SchemaHelper
 {
+    private static nint _emptyCEconItemView;
+
+    public static nint GetEmptyCEconItemView()
+    {
+        if (_emptyCEconItemView == nint.Zero)
+        {
+            var itemView = CreateCEconItemView();
+            itemView.Initialized = false;
+            _emptyCEconItemView = itemView.Address;
+        }
+        return _emptyCEconItemView;
+    }
+
+    public static void FreeEmptyCEconItemView()
+    {
+        if (_emptyCEconItemView == nint.Zero)
+            return;
+        Marshal.FreeHGlobal(_emptyCEconItemView);
+        _emptyCEconItemView = nint.Zero;
+    }
+
     public static CEconItemView CreateCEconItemView(nint copyFrom = 0)
     {
         var ptr = Marshal.AllocHGlobal(Helper.GetSchemaSize<CEconItemView>());

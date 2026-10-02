@@ -130,6 +130,12 @@ public static class ConVars
         0
     );
 
+    public static readonly IConVar<bool> IsPetEnabled = Runtime.Core.ConVar.CreateOrFind(
+        "invsim_pet_enabled",
+        "Allow players' pets to spawn.",
+        true
+    );
+
     public static void Initialize()
     {
         _ = Url;
@@ -151,5 +157,6 @@ public static class ConVars
         _ = IsStatTrakIgnoreBots;
         _ = IsFallbackTeam;
         _ = MinModels;
+        _ = IsPetEnabled;
     }
 }

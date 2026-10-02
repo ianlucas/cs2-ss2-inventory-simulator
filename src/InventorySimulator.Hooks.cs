@@ -83,6 +83,8 @@ public partial class InventorySimulator
     {
         return (thisPtr, team, slot) =>
         {
+            if (slot == (int)loadout_slot_t.LOADOUT_SLOT_PET && !ConVars.IsPetEnabled.Value)
+                return SchemaHelper.GetEmptyCEconItemView();
             var ret = next()(thisPtr, team, slot);
             var inventory = new CCSPlayerInventory(thisPtr);
             if (!inventory.IsValid)

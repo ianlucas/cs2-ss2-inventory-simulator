@@ -108,5 +108,6 @@ public partial class InventorySimulator(ISwiftlyCore core) : BasePlugin(core)
         OnIsRequireInventoryChanged(false);
         OnIsSprayOnUseChanged(false);
         CCSPlayerControllerState.ClearAllEconItemView();
+        SchemaHelper.FreeEmptyCEconItemView();
     }
 }
