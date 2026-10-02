@@ -23,6 +23,7 @@ public partial class InventorySimulator(ISwiftlyCore core) : BasePlugin(core)
         Runtime.Initialize();
         ConVars.Initialize();
         Core.Event.OnEntityCreated += OnEntityCreated;
+        Core.Event.OnEntitySpawned += OnEntitySpawned;
         Core.Event.OnEntityDeleted += OnEntityDeleted;
         Core.Event.OnConVarValueChanged += OnConVarValueChanged;
         Core.Event.OnMapLoad += OnMapLoad;

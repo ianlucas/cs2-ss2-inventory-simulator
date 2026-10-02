@@ -66,6 +66,27 @@ public partial class InventorySimulator
         }
     }
 
+    public void OnEntitySpawned(IOnEntitySpawnedEvent @event)
+    {
+        var entity = @event.Entity;
+        var designerName = entity.DesignerName;
+        if (designerName == "chicken")
+        {
+            Core.Scheduler.NextWorldUpdate(() =>
+            {
+                var chicken = entity.As<CChicken>();
+                if (!chicken.IsValid)
+                    return;
+                var controller = chicken.Owner.Value;
+                if (controller == null || controller.SteamID == 0)
+                    return;
+                var item = controller.GetState().Inventory?.Pet;
+                if (item != null)
+                    chicken.ApplyPetStyle(item);
+            });
+        }
+    }
+
     public void OnEntityDeleted(IOnEntityDeletedEvent @event)
     {
         var entity = @event.Entity;
