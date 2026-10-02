@@ -12,12 +12,25 @@ public static class CChickenExtensions
 {
     public static void ApplyPetStyle(this CChicken self, InventoryItem item)
     {
-        if (item.Style == null || item.Style <= 0)
-            return;
         var skeletonInstance = self.GetSkeletonInstance();
         if (skeletonInstance == null)
             return;
-        skeletonInstance.MaterialGroup = new CUtlStringToken(item.Style.Value.ToString());
+        var materialGroup =
+            item.Style > 0 ? new CUtlStringToken(item.Style.Value.ToString()) : default;
+        if (skeletonInstance.MaterialGroup.HashCode == materialGroup.HashCode)
+            return;
+        skeletonInstance.MaterialGroup = materialGroup;
         skeletonInstance.MaterialGroupUpdated();
+    }
+
+    public static bool UpdatePet(this CChicken self, InventoryItem item, nint itemView)
+    {
+        if (item.Model == null)
+            return false;
+        Natives.CEconItemView_OperatorEquals.Call(self.AttributeManager.Item.Address, itemView);
+        if (!string.Equals(self.GetModel(), item.Model, StringComparison.OrdinalIgnoreCase))
+            self.SetModel(item.Model);
+        self.ApplyPetStyle(item);
+        return true;
     }
 }

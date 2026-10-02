@@ -88,6 +88,7 @@ public static class IPlayerExtensions
                 self.RegiveAgent(inventory, oldInventory);
                 self.RegiveGloves(inventory, oldInventory);
                 self.RegiveWeapons(inventory, oldInventory);
+                self.RegivePet(inventory, oldInventory);
             }
         }
 
@@ -174,6 +175,35 @@ public static class IPlayerExtensions
             if (oldItem == item)
                 return;
             pawn.RefreshGloves(item != null);
+        }
+
+        public CChicken? GetPetChicken()
+        {
+            var controllerIndex = self.Controller.Index;
+            return Runtime
+                .Core.EntitySystem.GetAllEntitiesByDesignerName<CChicken>("chicken")
+                .FirstOrDefault(chicken =>
+                    chicken.LifeState == (byte)LifeState_t.LIFE_ALIVE
+                    && chicken.Owner.Value?.Index == controllerIndex
+                );
+        }
+
+        public void RegivePet(PlayerInventory inventory, PlayerInventory? oldInventory)
+        {
+            var item = inventory.Pet;
+            if (oldInventory?.Pet == item)
+                return;
+            var chicken = self.GetPetChicken();
+            if (chicken == null)
+                return;
+            var playerInventory = self.Controller.InventoryServices?.GetInventory();
+            if (item?.IsDeployablePet == true && playerInventory?.IsValid == true)
+            {
+                var itemView = playerInventory.GetItemInLoadout(0, loadout_slot_t.LOADOUT_SLOT_PET);
+                if (chicken.UpdatePet(item, itemView))
+                    return;
+            }
+            chicken.Despawn();
         }
 
         public void RegiveWeapons(PlayerInventory inventory, PlayerInventory? oldInventory)

@@ -21,6 +21,9 @@ public class InventoryItem
     [JsonPropertyName("keychains")]
     public List<KeychainItem>? Keychains { get; set; }
 
+    [JsonPropertyName("model")]
+    public string? Model { get; set; }
+
     [JsonPropertyName("musicId")]
     public int? MusicId { get; set; }
 
@@ -68,6 +71,8 @@ public class InventoryItem
             _attributesCache = null;
         }
     }
+
+    public bool IsDeployablePet => PetId != null && (UpgradeLevel == null || UpgradeLevel > 1);
 
     private (int? statTrak, List<(string, float)> attributes)? _attributesCache;
 
