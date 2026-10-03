@@ -16,8 +16,11 @@
     "linux": 112,
     "windows": 112
   },
-  // cleared on owned chickens by the chicken manager's think after round_freeze_end
-  // find the "chicken" loop doing *(_BYTE *)(chicken + offset) = 0;
+  // 1. Find CCSChickenManager::ServerGamePostSimulate (see signatures.jsonc).
+  // 2. Look for the loop through the "chicken" entities that have an owner.
+  // 3. It does *(_BYTE *)(chicken + offset) = 0;
+  // 4. To confirm, search for the "has set desired activity" string, the chicken functions using it
+  //    check *(_BYTE *)(chicken + offset) before allowing walk, run, glide and land.
   "CChicken::m_bCanRoam": {
     "windows": 13025,
     "linux": 13737
