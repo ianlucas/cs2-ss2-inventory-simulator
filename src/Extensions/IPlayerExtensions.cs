@@ -188,12 +188,11 @@ public static class IPlayerExtensions
                 return;
             var position = chicken.AbsOrigin;
             var angles = chicken.AbsRotation;
-            var canRoam = chicken.CanRoam;
+            var canRoam = chicken.CanRoam();
             chicken.Despawn();
             // The client only applies the pet's look when the chicken is created.
             var pet = CChicken.CreatePet(self.Controller, position, angles);
-            if (pet != null)
-                pet.CanRoam = canRoam;
+            pet?.SetCanRoam(canRoam);
         }
 
         public void RegiveWeapons(PlayerInventory inventory, PlayerInventory? oldInventory)

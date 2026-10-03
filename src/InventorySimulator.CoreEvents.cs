@@ -26,6 +26,9 @@ public partial class InventorySimulator
             case "invsim_pet_immortal":
                 OnIsPetImmortalChanged(ConVars.IsPetImmortal.Value);
                 return;
+            case "invsim_pet_free_roam":
+                OnIsPetFreeRoamChanged(ConVars.IsPetFreeRoam.Value);
+                return;
             case "invsim_url":
                 OnUrlChanged(@event.OldValue, @event.NewValue);
                 return;

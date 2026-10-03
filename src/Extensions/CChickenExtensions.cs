@@ -11,20 +11,6 @@ namespace InventorySimulator;
 
 public static class CChickenExtensions
 {
-    extension(CChicken self)
-    {
-        // The game stops pets from roaming shortly after freeze time ends.
-        public bool CanRoam
-        {
-            get => Marshal.ReadByte(self.Address + Natives.CChicken_m_bCanRoam) != 0;
-            set =>
-                Marshal.WriteByte(
-                    self.Address + Natives.CChicken_m_bCanRoam,
-                    (byte)(value ? 1 : 0)
-                );
-        }
-    }
-
     extension(CChicken)
     {
         // Mirrors how the game spawns pets on round_start.
@@ -56,6 +42,17 @@ public static class CChickenExtensions
             chicken.DispatchSpawn();
             return chicken;
         }
+    }
+
+    // The game stops pets from roaming shortly after freeze time ends.
+    public static bool CanRoam(this CChicken self)
+    {
+        return Marshal.ReadByte(self.Address + Natives.CChicken_m_bCanRoam) != 0;
+    }
+
+    public static void SetCanRoam(this CChicken self, bool value)
+    {
+        Marshal.WriteByte(self.Address + Natives.CChicken_m_bCanRoam, (byte)(value ? 1 : 0));
     }
 
     public static void ApplyPetStyle(this CChicken self, InventoryItem item)

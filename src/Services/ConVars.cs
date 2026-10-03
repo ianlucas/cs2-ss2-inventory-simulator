@@ -142,6 +142,12 @@ public static class ConVars
         false
     );
 
+    public static readonly IConVar<bool> IsPetFreeRoam = Runtime.Core.ConVar.CreateOrFind(
+        "invsim_pet_free_roam",
+        "Allow players' pets to keep roaming after freeze time ends.",
+        false
+    );
+
     public static void Initialize()
     {
         _ = Url;
@@ -165,5 +171,6 @@ public static class ConVars
         _ = MinModels;
         _ = IsPetEnabled;
         _ = IsPetImmortal;
+        _ = IsPetFreeRoam;
     }
 }

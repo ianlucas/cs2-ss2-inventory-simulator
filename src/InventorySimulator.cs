@@ -43,11 +43,13 @@ public partial class InventorySimulator(ISwiftlyCore core) : BasePlugin(core)
         OnIsRequireInventoryChanged(ConVars.IsRequireInventory.Value);
         OnIsSprayOnUseChanged(ConVars.IsSprayOnUse.Value);
         OnIsPetImmortalChanged(ConVars.IsPetImmortal.Value);
+        OnIsPetFreeRoamChanged(ConVars.IsPetFreeRoam.Value);
     }
 
     private Guid _giveNamedItemHookGuid;
     private Guid _getItemInLoadoutHookGuid;
     private Guid? _activatePlayerHookGuid;
+    private Guid? _chickenManagerPostSimulateHookGuid;
     private bool _isProcessUsercmdsHooked = false;
     private bool _isTakeDamageHooked = false;
 
@@ -114,6 +116,27 @@ public partial class InventorySimulator(ISwiftlyCore core) : BasePlugin(core)
         _isTakeDamageHooked = value;
     }
 
+    public void OnIsPetFreeRoamChanged(bool value)
+    {
+        if (value == (_chickenManagerPostSimulateHookGuid != null))
+            return;
+        if (value)
+            _chickenManagerPostSimulateHookGuid =
+                Natives.CCSChickenManager_ServerGamePostSimulate.AddHook(
+                    OnChickenManagerServerGamePostSimulate
+                );
+        else
+        {
+            Natives.CCSChickenManager_ServerGamePostSimulate.RemoveHook(
+                _chickenManagerPostSimulateHookGuid
+                    ?? throw new InvalidOperationException(
+                        "ServerGamePostSimulate hook not installed."
+                    )
+            );
+            _chickenManagerPostSimulateHookGuid = null;
+        }
+    }
+
     public override void Unload()
     {
         Natives.CCSPlayer_ItemServices_GiveNamedItem.RemoveHook(_giveNamedItemHookGuid);
@@ -121,6 +144,7 @@ public partial class InventorySimulator(ISwiftlyCore core) : BasePlugin(core)
         OnIsRequireInventoryChanged(false);
         OnIsSprayOnUseChanged(false);
         OnIsPetImmortalChanged(false);
+        OnIsPetFreeRoamChanged(false);
         CCSPlayerControllerState.ClearAllEconItemView();
         SchemaHelper.FreeEmptyCEconItemView();
     }

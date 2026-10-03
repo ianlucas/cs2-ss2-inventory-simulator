@@ -58,6 +58,9 @@ invsim_pet_enabled true
 invsim_pet_immortal false
     Prevent players' pets from taking damage.
 
+invsim_pet_free_roam false
+    Allow players' pets to keep roaming after freeze time ends.
+
 sw_ws
     Refreshes player inventory from the Inventory Simulator service and displays the configured URL.
 
