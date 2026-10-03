@@ -177,35 +177,23 @@ public static class IPlayerExtensions
             pawn.RefreshGloves(item != null);
         }
 
-        public CChicken? GetPetChicken()
-        {
-            var controllerIndex = self.Controller.Index;
-            return Runtime
-                .Core.EntitySystem.GetAllEntitiesByDesignerName<CChicken>("chicken")
-                .FirstOrDefault(chicken =>
-                    chicken.LifeState == (byte)LifeState_t.LIFE_ALIVE
-                    && chicken.Owner.Value?.Index == controllerIndex
-                );
-        }
-
         public void RegivePet(PlayerInventory inventory, PlayerInventory? oldInventory)
         {
             if (!ConVars.IsPetEnabled.Value)
                 return;
-            var item = inventory.Pet;
-            if (oldInventory?.Pet == item)
+            if (oldInventory?.Pet == inventory.Pet)
                 return;
-            var chicken = self.GetPetChicken();
-            if (chicken == null)
+            var chicken = self.Controller.GetPetChicken();
+            if (chicken == null || chicken.LifeState != (byte)LifeState_t.LIFE_ALIVE)
                 return;
-            var playerInventory = self.Controller.InventoryServices?.GetInventory();
-            if (item?.IsDeployablePet == true && playerInventory?.IsValid == true)
-            {
-                var itemView = playerInventory.GetItemInLoadout(0, loadout_slot_t.LOADOUT_SLOT_PET);
-                if (chicken.UpdatePet(item, itemView))
-                    return;
-            }
+            var position = chicken.AbsOrigin;
+            var angles = chicken.AbsRotation;
+            var canRoam = chicken.CanRoam;
             chicken.Despawn();
+            // The client only applies the pet's look when the chicken is created.
+            var pet = CChicken.CreatePet(self.Controller, position, angles);
+            if (pet != null)
+                pet.CanRoam = canRoam;
         }
 
         public void RegiveWeapons(PlayerInventory inventory, PlayerInventory? oldInventory)

@@ -15,5 +15,11 @@
   "CCSPlayerController_InventoryServices::m_pInventory": {
     "linux": 112,
     "windows": 112
+  },
+  // cleared on owned chickens by the chicken manager's think after round_freeze_end
+  // find the "chicken" loop doing *(_BYTE *)(chicken + offset) = 0;
+  "CChicken::m_bCanRoam": {
+    "windows": 13025,
+    "linux": 13737
   }
 }

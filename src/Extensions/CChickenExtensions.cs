@@ -3,6 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+using System.Runtime.InteropServices;
 using SwiftlyS2.Shared.Natives;
 using SwiftlyS2.Shared.SchemaDefinitions;
 
@@ -10,6 +11,53 @@ namespace InventorySimulator;
 
 public static class CChickenExtensions
 {
+    extension(CChicken self)
+    {
+        // The game stops pets from roaming shortly after freeze time ends.
+        public bool CanRoam
+        {
+            get => Marshal.ReadByte(self.Address + Natives.CChicken_m_bCanRoam) != 0;
+            set =>
+                Marshal.WriteByte(
+                    self.Address + Natives.CChicken_m_bCanRoam,
+                    (byte)(value ? 1 : 0)
+                );
+        }
+    }
+
+    extension(CChicken)
+    {
+        // Mirrors how the game spawns pets on round_start.
+        public static CChicken? CreatePet(
+            CCSPlayerController controller,
+            Vector? position,
+            QAngle? angles
+        )
+        {
+            var inventory = controller.InventoryServices?.GetInventory();
+            if (inventory?.IsValid != true)
+                return null;
+            // InitPet doesn't check that the pet slot is equipped, the game does it before calling.
+            var itemView = Runtime.Core.Memory.ToSchemaClass<CEconItemView>(
+                inventory.GetItemInLoadout(0, loadout_slot_t.LOADOUT_SLOT_PET)
+            );
+            if (!itemView.IsValid || !itemView.Initialized)
+                return null;
+            var chicken = Runtime.Core.EntitySystem.CreateEntityByDesignerName<CChicken>("chicken");
+            if (chicken == null)
+                return null;
+            if (Natives.CChicken_InitPet.Call(chicken.Address, controller.Address) == nint.Zero)
+            {
+                chicken.Despawn();
+                return null;
+            }
+            controller.SetPetChicken(chicken);
+            chicken.Teleport(position, angles, null);
+            chicken.DispatchSpawn();
+            return chicken;
+        }
+    }
+
     public static void ApplyPetStyle(this CChicken self, InventoryItem item)
     {
         var skeletonInstance = self.GetSkeletonInstance();
@@ -21,17 +69,5 @@ public static class CChickenExtensions
             return;
         skeletonInstance.MaterialGroup = materialGroup;
         skeletonInstance.MaterialGroupUpdated();
-    }
-
-    public static bool UpdatePet(this CChicken self, InventoryItem item, nint itemView)
-    {
-        if (item.Model == null)
-            return false;
-        var model = $"{item.Model}.vmdl";
-        Natives.CEconItemView_OperatorEquals.Call(self.AttributeManager.Item.Address, itemView);
-        if (!string.Equals(self.GetModel(), model, StringComparison.OrdinalIgnoreCase))
-            self.SetModel(model);
-        self.ApplyPetStyle(item);
-        return true;
     }
 }

@@ -38,5 +38,18 @@ public static class CCSPlayerControllerExtensions
             controllerState.ClearEconItemView();
             _controllerStateManager.TryRemove(self.Index, out var _);
         }
+
+        public CChicken? GetPetChicken()
+        {
+            var chicken = Runtime.Core.Memory.ToSchemaClass<CChicken>(
+                Natives.CCSPlayerController_GetPetChicken.Call(self.Address)
+            );
+            return chicken.IsValid ? chicken : null;
+        }
+
+        public void SetPetChicken(CChicken chicken)
+        {
+            Natives.CCSPlayerController_SetPetChicken.Call(self.Address, chicken.Address);
+        }
     }
 }
