@@ -42,12 +42,14 @@ public partial class InventorySimulator(ISwiftlyCore core) : BasePlugin(core)
         OnFileChanged();
         OnIsRequireInventoryChanged(ConVars.IsRequireInventory.Value);
         OnIsSprayOnUseChanged(ConVars.IsSprayOnUse.Value);
+        OnIsPetImmortalChanged(ConVars.IsPetImmortal.Value);
     }
 
     private Guid _giveNamedItemHookGuid;
     private Guid _getItemInLoadoutHookGuid;
     private Guid? _activatePlayerHookGuid;
     private bool _isProcessUsercmdsHooked = false;
+    private bool _isTakeDamageHooked = false;
 
     public void OnFileChanged()
     {
@@ -101,12 +103,24 @@ public partial class InventorySimulator(ISwiftlyCore core) : BasePlugin(core)
         _isProcessUsercmdsHooked = value;
     }
 
+    public void OnIsPetImmortalChanged(bool value)
+    {
+        if (value == _isTakeDamageHooked)
+            return;
+        if (value)
+            Core.GameHooks.Entities.TakeDamage.Pre += OnTakeDamagePre;
+        else
+            Core.GameHooks.Entities.TakeDamage.Pre -= OnTakeDamagePre;
+        _isTakeDamageHooked = value;
+    }
+
     public override void Unload()
     {
         Natives.CCSPlayer_ItemServices_GiveNamedItem.RemoveHook(_giveNamedItemHookGuid);
         Natives.CCSPlayerInventory_GetItemInLoadout.RemoveHook(_getItemInLoadoutHookGuid);
         OnIsRequireInventoryChanged(false);
         OnIsSprayOnUseChanged(false);
+        OnIsPetImmortalChanged(false);
         CCSPlayerControllerState.ClearAllEconItemView();
         SchemaHelper.FreeEmptyCEconItemView();
     }

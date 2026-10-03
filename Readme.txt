@@ -55,6 +55,9 @@ invsim_minmodels 0
 invsim_pet_enabled true
     Allow players' pets to spawn.
 
+invsim_pet_immortal false
+    Prevent players' pets from taking damage.
+
 sw_ws
     Refreshes player inventory from the Inventory Simulator service and displays the configured URL.
 
