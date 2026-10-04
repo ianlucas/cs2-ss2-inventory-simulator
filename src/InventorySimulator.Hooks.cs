@@ -126,8 +126,8 @@ public partial class InventorySimulator
                 if (!player.IsValid)
                     continue;
                 var chicken = player.Controller.GetPetChicken();
-                if (chicken != null && !chicken.CanRoam())
-                    chicken.SetCanRoam(true);
+                if (chicken != null && !chicken.CanRoam)
+                    chicken.CanRoam = true;
             }
         };
     }

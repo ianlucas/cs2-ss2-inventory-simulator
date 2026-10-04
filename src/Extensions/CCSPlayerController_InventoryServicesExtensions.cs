@@ -11,11 +11,7 @@ public static class CCSPlayerController_InventoryServicesExtensions
 {
     extension(CCSPlayerController_InventoryServices self)
     {
-        public CCSPlayerInventory GetInventory()
-        {
-            return new CCSPlayerInventory(
-                self.Address + Natives.CCSPlayerController_InventoryServices_m_pInventory
-            );
-        }
+        public CCSPlayerInventory Inventory =>
+            new(self.Address + Natives.CCSPlayerController_InventoryServices_m_pInventory);
     }
 }

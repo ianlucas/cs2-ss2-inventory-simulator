@@ -75,7 +75,7 @@ public static class IPlayerExtensions
 
         public void HandleInventoryLoad()
         {
-            var inventory = self.Controller.InventoryServices?.GetInventory();
+            var inventory = self.Controller.InventoryServices?.Inventory;
             if (inventory?.IsValid == true)
                 inventory.SendInventoryUpdateEvent();
         }
@@ -189,11 +189,11 @@ public static class IPlayerExtensions
                 return;
             var position = chicken.AbsOrigin;
             var angles = chicken.AbsRotation;
-            var canRoam = chicken.CanRoam();
+            var canRoam = chicken.CanRoam;
             chicken.Despawn();
             // The client only applies the pet's look when the chicken is created.
             var pet = CChicken.CreatePet(self.Controller, position, angles);
-            pet?.SetCanRoam(canRoam);
+            pet?.CanRoam = canRoam;
         }
 
         public void RespawnPet()
