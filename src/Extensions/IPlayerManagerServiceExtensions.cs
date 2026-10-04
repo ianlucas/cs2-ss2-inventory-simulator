@@ -9,8 +9,11 @@ namespace InventorySimulator;
 
 public static class IPlayerManagerServiceExtensions
 {
-    public static IPlayer? GetPlayerFromSteamID(this IPlayerManagerService self, ulong steamID)
+    extension(IPlayerManagerService self)
     {
-        return self.GetAllPlayers().FirstOrDefault(p => p.SteamID == steamID);
+        public IPlayer? GetPlayerFromSteamID(ulong steamID)
+        {
+            return self.GetAllPlayers().FirstOrDefault(p => p.SteamID == steamID);
+        }
     }
 }

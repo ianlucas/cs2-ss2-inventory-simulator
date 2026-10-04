@@ -44,27 +44,30 @@ public static class CChickenExtensions
         }
     }
 
-    // The game stops pets from roaming shortly after freeze time ends.
-    public static bool CanRoam(this CChicken self)
+    extension(CChicken self)
     {
-        return Marshal.ReadByte(self.Address + Natives.CChicken_m_bCanRoam) != 0;
-    }
+        // The game stops pets from roaming shortly after freeze time ends.
+        public bool CanRoam()
+        {
+            return Marshal.ReadByte(self.Address + Natives.CChicken_m_bCanRoam) != 0;
+        }
 
-    public static void SetCanRoam(this CChicken self, bool value)
-    {
-        Marshal.WriteByte(self.Address + Natives.CChicken_m_bCanRoam, (byte)(value ? 1 : 0));
-    }
+        public void SetCanRoam(bool value)
+        {
+            Marshal.WriteByte(self.Address + Natives.CChicken_m_bCanRoam, (byte)(value ? 1 : 0));
+        }
 
-    public static void ApplyPetStyle(this CChicken self, InventoryItem item)
-    {
-        var skeletonInstance = self.GetSkeletonInstance();
-        if (skeletonInstance == null)
-            return;
-        var materialGroup =
-            item.Style > 0 ? new CUtlStringToken(item.Style.Value.ToString()) : default;
-        if (skeletonInstance.MaterialGroup.HashCode == materialGroup.HashCode)
-            return;
-        skeletonInstance.MaterialGroup = materialGroup;
-        skeletonInstance.MaterialGroupUpdated();
+        public void ApplyPetStyle(InventoryItem item)
+        {
+            var skeletonInstance = self.GetSkeletonInstance();
+            if (skeletonInstance == null)
+                return;
+            var materialGroup =
+                item.Style > 0 ? new CUtlStringToken(item.Style.Value.ToString()) : default;
+            if (skeletonInstance.MaterialGroup.HashCode == materialGroup.HashCode)
+                return;
+            skeletonInstance.MaterialGroup = materialGroup;
+            skeletonInstance.MaterialGroupUpdated();
+        }
     }
 }
