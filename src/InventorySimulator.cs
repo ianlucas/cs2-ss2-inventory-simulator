@@ -43,7 +43,7 @@ public partial class InventorySimulator(ISwiftlyCore core) : BasePlugin(core)
         OnIsRequireInventoryChanged(ConVars.IsRequireInventory.Value);
         OnIsSprayOnUseChanged(ConVars.IsSprayOnUse.Value);
         OnIsPetImmortalChanged(ConVars.IsPetImmortal.Value);
-        OnIsPetFreeRoamChanged(ConVars.IsPetFreeRoam.Value);
+        OnPetRoamChanged(ConVars.IsPetFreeRoam.Value || ConVars.IsPetRespawn.Value);
     }
 
     private Guid _giveNamedItemHookGuid;
@@ -116,7 +116,7 @@ public partial class InventorySimulator(ISwiftlyCore core) : BasePlugin(core)
         _isTakeDamageHooked = value;
     }
 
-    public void OnIsPetFreeRoamChanged(bool value)
+    public void OnPetRoamChanged(bool value)
     {
         if (value == (_chickenManagerPostSimulateHookGuid != null))
             return;
@@ -144,7 +144,7 @@ public partial class InventorySimulator(ISwiftlyCore core) : BasePlugin(core)
         OnIsRequireInventoryChanged(false);
         OnIsSprayOnUseChanged(false);
         OnIsPetImmortalChanged(false);
-        OnIsPetFreeRoamChanged(false);
+        OnPetRoamChanged(false);
         CCSPlayerControllerState.ClearAllEconItemView();
         SchemaHelper.FreeEmptyCEconItemView();
     }

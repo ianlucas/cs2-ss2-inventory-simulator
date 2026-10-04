@@ -148,6 +148,18 @@ public static class ConVars
         false
     );
 
+    public static readonly IConVar<bool> IsPetRespawn = Runtime.Core.ConVar.CreateOrFind(
+        "invsim_pet_respawn",
+        "Spawn players' pets when they spawn and their pet isn't alive, and let them roam during warmup.",
+        false
+    );
+
+    public static readonly IConVar<bool> IsPetRespawnWarmupOnly = Runtime.Core.ConVar.CreateOrFind(
+        "invsim_pet_respawn_warmup_only",
+        "Only apply invsim_pet_respawn during warmup.",
+        true
+    );
+
     public static void Initialize()
     {
         _ = Url;
@@ -172,5 +184,7 @@ public static class ConVars
         _ = IsPetEnabled;
         _ = IsPetImmortal;
         _ = IsPetFreeRoam;
+        _ = IsPetRespawn;
+        _ = IsPetRespawnWarmupOnly;
     }
 }

@@ -116,7 +116,10 @@ public partial class InventorySimulator
         return (thisPtr, msg) =>
         {
             next()(thisPtr, msg);
-            if (!ConVars.IsPetFreeRoam.Value)
+            if (
+                !ConVars.IsPetFreeRoam.Value
+                && !(ConVars.IsPetRespawn.Value && Core.EntitySystem.IsWarmupPeriod())
+            )
                 return;
             foreach (var player in Core.PlayerManager.GetAllPlayers())
             {

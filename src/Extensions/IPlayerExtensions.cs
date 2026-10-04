@@ -102,6 +102,7 @@ public static class IPlayerExtensions
                     .Controller.GetState()
                     .Inventory?.GetGloves(self.Controller.TeamNum, ConVars.IsFallbackTeam.Value);
                 self.PlayerPawn?.RefreshGloves(gloves != null);
+                self.RespawnPet();
             });
         }
 
@@ -193,6 +194,22 @@ public static class IPlayerExtensions
             // The client only applies the pet's look when the chicken is created.
             var pet = CChicken.CreatePet(self.Controller, position, angles);
             pet?.SetCanRoam(canRoam);
+        }
+
+        public void RespawnPet()
+        {
+            if (!ConVars.IsPetRespawn.Value || !ConVars.IsPetEnabled.Value)
+                return;
+            if (ConVars.IsPetRespawnWarmupOnly.Value && !Runtime.Core.EntitySystem.IsWarmupPeriod())
+                return;
+            var chicken = self.Controller.GetPetChicken();
+            if (chicken != null && chicken.LifeState == (byte)LifeState_t.LIFE_ALIVE)
+                return;
+            // The game spawns pets at a random spot near their team's spawn points, or anywhere
+            // on the map in deathmatch.
+            var spawnPoint = Runtime.Core.EntitySystem.GetRandomSpawnPoint(self.Controller.TeamNum);
+            if (spawnPoint != null)
+                CChicken.CreatePet(self.Controller, spawnPoint.AbsOrigin, null);
         }
 
         public void RegiveWeapons(PlayerInventory inventory, PlayerInventory? oldInventory)
