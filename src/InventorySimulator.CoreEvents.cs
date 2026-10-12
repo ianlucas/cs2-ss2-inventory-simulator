@@ -23,6 +23,9 @@ public partial class InventorySimulator
             case "invsim_spray_on_use":
                 OnIsSprayOnUseChanged(ConVars.IsSprayOnUse.Value);
                 return;
+            case "invsim_loadout_enabled":
+                OnIsLoadoutEnabledChanged();
+                return;
             case "invsim_pet_immortal":
                 OnIsPetImmortalChanged(ConVars.IsPetImmortal.Value);
                 return;

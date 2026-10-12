@@ -124,6 +124,12 @@ public static class ConVars
         false
     );
 
+    public static readonly IConVar<bool> IsLoadoutEnabled = Runtime.Core.ConVar.CreateOrFind(
+        "invsim_loadout_enabled",
+        "Give players the weapons of their equipped loadout instead of their game loadout.",
+        true
+    );
+
     public static readonly IConVar<int> MinModels = Runtime.Core.ConVar.CreateOrFind(
         "invsim_minmodels",
         "Enable player agents (0 = enabled, 1 = use map models per team, 2 = SAS & Phoenix).",
@@ -180,6 +186,7 @@ public static class ConVars
         _ = IsPublicApiSprayConsume;
         _ = IsStatTrakIgnoreBots;
         _ = IsFallbackTeam;
+        _ = IsLoadoutEnabled;
         _ = MinModels;
         _ = IsPetEnabled;
         _ = IsPetImmortal;

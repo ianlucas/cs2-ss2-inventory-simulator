@@ -94,6 +94,13 @@ public partial class InventorySimulator(ISwiftlyCore core) : BasePlugin(core)
         }
     }
 
+    public void OnIsLoadoutEnabledChanged()
+    {
+        foreach (var player in Core.PlayerManager.GetAllPlayers())
+            if (player.IsValid && !player.IsFakeClient)
+                player.HandleInventoryLoad();
+    }
+
     public void OnIsSprayOnUseChanged(bool value)
     {
         if (value == _isProcessUsercmdsHooked)
