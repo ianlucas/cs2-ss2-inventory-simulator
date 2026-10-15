@@ -29,6 +29,15 @@
     "windows": "41 83 F8 39 77 ? 83 FA 03 77 ? 48 63 C2 48 6B D0 3A",
     "linux": "83 FA 39 77 ? 83 FE 03 77 ? 48 63 F6 48 63 D2 48 69 F6"
   },
+  // 1. Find CCSPlayerInventory::GetItemInLoadout (see above).
+  // 2. When the equipped item isn't found by its ID, it calls a function with the
+  //    CCSInventoryManager global, the item's definition index, 0 and 0.
+  // 3. That function allocates and caches a CEconItemView when its lookup fails.
+  "CInventoryManager::GetReferenceEconItem": {
+    "lib": "server",
+    "windows": "48 89 6C 24 ? 48 89 74 24 ? 41 56 48 83 EC ? 0F B7 F2 41 8B E8",
+    "linux": "55 0F B6 C9 48 89 E5 41 57 44 0F B7 FE 41 56 41 89 D6"
+  },
   "CEconItemView::CEconItemView": {
     "lib": "server",
     "windows": "48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 41 54 41 55 41 56 41 57 48 83 EC ? 48 8B F9 48 8D 05",

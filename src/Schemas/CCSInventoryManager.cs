@@ -19,4 +19,9 @@ public class CCSInventoryManager(nint address) : INativeHandle
     {
         return Natives.CCSInventoryManager_GetBaseItemForTeam.Call(Address, team, (int)slot);
     }
+
+    public nint GetReferenceEconItem(ushort defIndex)
+    {
+        return Natives.CInventoryManager_GetReferenceEconItem.Call(Address, defIndex, 0, 0);
+    }
 }

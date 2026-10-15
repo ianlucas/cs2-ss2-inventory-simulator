@@ -27,6 +27,25 @@ public class CCSPlayerInventory(nint address) : INativeHandle
         return Natives.CCSPlayerInventory_GetItemInLoadout.Call(Address, team, (int)slot);
     }
 
+    // Only the player's own items, the game's stock weapons have no item ID.
+    public nint FindWeaponInLoadout(byte team, ushort def)
+    {
+        for (
+            var slot = loadout_slot_t.LOADOUT_SLOT_FIRST_WHEEL_WEAPON;
+            slot <= loadout_slot_t.LOADOUT_SLOT_LAST_WHEEL_WEAPON;
+            slot++
+        )
+        {
+            // Unhooked, so it reads the player's game loadout.
+            var itemView = Runtime.Core.Memory.ToSchemaClass<CEconItemView>(
+                Natives.CCSPlayerInventory_GetItemInLoadout.CallOriginal(Address, team, (int)slot)
+            );
+            if (itemView.IsValid && itemView.ItemID != 0 && itemView.ItemDefinitionIndex == def)
+                return itemView.Address;
+        }
+        return nint.Zero;
+    }
+
     public void SendInventoryUpdateEvent()
     {
         Natives.CCSPlayerInventory_SendInventoryUpdateEvent.Call(Address);

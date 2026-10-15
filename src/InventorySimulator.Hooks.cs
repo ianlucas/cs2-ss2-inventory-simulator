@@ -110,9 +110,19 @@ public partial class InventorySimulator
                 ConVars.IsFallbackTeam.Value,
                 ConVars.MinModels.Value
             );
-            // Buying, the buy menu and the spawn weapons all read the weapon from here.
+            // Buying, the buy menu and the spawn weapons all read the weapon from here. The player
+            // may have it equipped in another slot of their game loadout, otherwise the game
+            // returns this same stock item when a default-equipped weapon has no skin.
             if (item == null && loadoutDef != null && loadoutDef != def)
-                item = InventoryItem.CreateStock(loadoutDef.Value);
+            {
+                var gameItem = inventory.FindWeaponInLoadout((byte)team, loadoutDef.Value);
+                if (gameItem != nint.Zero)
+                    return gameItem;
+                var stockItem = SchemaHelper
+                    .GetInventoryManager()
+                    .GetReferenceEconItem(loadoutDef.Value);
+                return stockItem != nint.Zero ? stockItem : ret;
+            }
             if (item != null)
                 return controllerState.GetEconItemView(team, slot, item, ret);
             return ret;
