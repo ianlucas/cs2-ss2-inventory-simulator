@@ -30,4 +30,14 @@ public static partial class Natives
             );
         return Runtime.Core.GameData.GetOffset(offsetName);
     }
+
+    private static nint GetGameSystemByName(string name)
+    {
+        nint? address = Runtime.Core.Engine.FindGameSystemByName(name);
+        if (address is null)
+            throw new InvalidOperationException(
+                $"Failed to locate game system '{name}'. The game system may not exist in the current game version."
+            );
+        return address.Value;
+    }
 }

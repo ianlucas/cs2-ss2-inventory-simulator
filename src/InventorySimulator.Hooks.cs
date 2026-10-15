@@ -83,8 +83,11 @@ public partial class InventorySimulator
     {
         return (thisPtr, team, slot) =>
         {
+            // Same as an unequipped slot, the game's base item for pets is empty.
             if (slot == (int)loadout_slot_t.LOADOUT_SLOT_PET && !ConVars.IsPetEnabled.Value)
-                return SchemaHelper.GetEmptyCEconItemView();
+                return SchemaHelper
+                    .GetInventoryManager()
+                    .GetBaseItemForTeam((byte)team, (loadout_slot_t)slot);
             var ret = next()(thisPtr, team, slot);
             var inventory = new CCSPlayerInventory(thisPtr);
             if (!inventory.IsValid)

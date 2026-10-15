@@ -153,6 +153,5 @@ public partial class InventorySimulator(ISwiftlyCore core) : BasePlugin(core)
         OnIsPetImmortalChanged(false);
         OnPetRoamChanged(false);
         CCSPlayerControllerState.ClearAllEconItemView();
-        SchemaHelper.FreeEmptyCEconItemView();
     }
 }
