@@ -28,7 +28,7 @@ public static partial class Natives
             "CCSPlayerPawn::SetModelFromClass"
         );
 
-    public delegate nint CCSPlayerPawn_SetModelFromLoadoutDelegate(nint thisPtr);
+    public delegate void CCSPlayerPawn_SetModelFromLoadoutDelegate(nint thisPtr);
 
     public static readonly IUnmanagedFunction<CCSPlayerPawn_SetModelFromLoadoutDelegate> CCSPlayerPawn_SetModelFromLoadout =
         GetFunctionBySignature<CCSPlayerPawn_SetModelFromLoadoutDelegate>(

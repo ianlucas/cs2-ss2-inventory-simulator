@@ -20,7 +20,7 @@ public static partial class Natives
             "CCSPlayerInventory::GetItemInLoadout"
         );
 
-    public delegate nint CCSPlayerInventory_SendInventoryUpdateEventDelegate(nint thisPtr);
+    public delegate void CCSPlayerInventory_SendInventoryUpdateEventDelegate(nint thisPtr);
 
     public static readonly IUnmanagedFunction<CCSPlayerInventory_SendInventoryUpdateEventDelegate> CCSPlayerInventory_SendInventoryUpdateEvent =
         GetFunctionBySignature<CCSPlayerInventory_SendInventoryUpdateEventDelegate>(

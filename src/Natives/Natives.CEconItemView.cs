@@ -9,7 +9,7 @@ namespace InventorySimulator;
 
 public static partial class Natives
 {
-    public delegate nint CEconItemView_ConstructorDelegate(nint thisPtr);
+    public delegate void CEconItemView_ConstructorDelegate(nint thisPtr);
 
     public static readonly IUnmanagedFunction<CEconItemView_ConstructorDelegate> CEconItemView_Constructor =
         GetFunctionBySignature<CEconItemView_ConstructorDelegate>("CEconItemView::CEconItemView");

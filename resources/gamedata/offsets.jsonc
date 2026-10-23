@@ -1,17 +1,28 @@
 {
-  // set in SOCacheSubscribed
-  // find instruction like *(_QWORD *)(a1 + 104) = a3;
-  // a3 is the subscribed caches
+  // 1. Find the CCSPlayerInventory vtable (see CCSPlayerInventory::GetItemInLoadout in
+  //    signatures.jsonc).
+  // 2. Take the function at index 3 (SOCacheSubscribed), it stores its cache argument with
+  //    *(_QWORD *)(inventory + offset) = cache.
+  // 3. To confirm, the function at index 14 on Linux and 13 on Windows (SOCacheUnsubscribed) sets
+  //    the same field to 0.
   "CCSPlayerInventory::m_pSOCache": {
     "windows": 104,
     "linux": 104
   },
-  // cstrike15_src, found by the virtual function GetOwner
+  // 1. Find the GCSDK::CGCClientSharedObjectCache vtable.
+  //    Linux: _ZTVN5GCSDK26CGCClientSharedObjectCacheE, functions start 0x10 after it.
+  //    Windows: xref ??_R4CGCClientSharedObjectCache@GCSDK@@6B@, functions start 8 bytes after
+  //    that xref.
+  // 2. Take the function at index 2 on Linux and 1 on Windows (GetOwner), it returns the SOID_t at
+  //    the offset.
   "CGCClientSharedObjectCache::m_Owner": {
     "windows": 40,
     "linux": 40
   },
-  // after m_nPersonaDataXpTrailLevel + 4
+  // 1. Find CChicken::InitPet (see signatures.jsonc).
+  // 2. It calls a small function that returns the controller's m_pInventoryServices, then a small
+  //    function that calls GetItemInLoadout(services + offset, 0, 57).
+  // 3. The inventory is embedded in the services at the offset, it isn't a pointer.
   "CCSPlayerController_InventoryServices::m_pInventory": {
     "linux": 112,
     "windows": 112
