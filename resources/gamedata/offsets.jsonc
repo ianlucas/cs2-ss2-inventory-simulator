@@ -33,7 +33,7 @@
   // 4. To confirm, search for the "has set desired activity" string, the chicken functions using it
   //    check *(_BYTE *)(chicken + offset) before allowing walk, run, glide and land.
   "CChicken::m_bCanRoam": {
-    "windows": 13025,
-    "linux": 13737
+    "windows": 13026,
+    "linux": 13738
   }
 }
