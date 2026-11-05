@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
 using SwiftlyS2.Shared.Natives;
 using SwiftlyS2.Shared.SchemaDefinitions;
 
@@ -49,12 +49,8 @@ public static class CChickenExtensions
         // The game stops pets from roaming shortly after freeze time ends.
         public bool CanRoam
         {
-            get => Marshal.ReadByte(self.Address + Natives.CChicken_m_bCanRoam) != 0;
-            set =>
-                Marshal.WriteByte(
-                    self.Address + Natives.CChicken_m_bCanRoam,
-                    (byte)(value ? 1 : 0)
-                );
+            get => Unsafe.Add(ref self.SpawnDyingParticles, -1);
+            set => Unsafe.Add(ref self.SpawnDyingParticles, -1) = value;
         }
 
         public void ApplyPetStyle(InventoryItem item)

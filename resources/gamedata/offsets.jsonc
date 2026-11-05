@@ -26,14 +26,13 @@
   "CCSPlayerController_InventoryServices::m_pInventory": {
     "linux": 112,
     "windows": 112
-  },
+  }
+  // CChicken::m_bCanRoam has no entry anymore. The plugin uses m_bSpawnDyingParticles's schema
+  // offset minus 1 instead, so it follows layout changes on its own. To check it on a new build:
   // 1. Find CCSChickenManager::ServerGamePostSimulate (see signatures.jsonc).
   // 2. Look for the loop through the "chicken" entities that have an owner.
   // 3. It does *(_BYTE *)(chicken + offset) = 0;
   // 4. To confirm, search for the "has set desired activity" string, the chicken functions using it
   //    check *(_BYTE *)(chicken + offset) before allowing walk, run, glide and land.
-  "CChicken::m_bCanRoam": {
-    "windows": 13026,
-    "linux": 13738
-  }
+  // 5. The offset must still be m_bSpawnDyingParticles's schema offset minus 1.
 }
