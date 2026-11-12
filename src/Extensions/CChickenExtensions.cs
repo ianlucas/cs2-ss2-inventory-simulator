@@ -49,8 +49,8 @@ public static class CChickenExtensions
         // The game stops pets from roaming shortly after freeze time ends.
         public bool CanRoam
         {
-            get => Unsafe.Add(ref self.SpawnDyingParticles, -1);
-            set => Unsafe.Add(ref self.SpawnDyingParticles, -1) = value;
+            get => Unsafe.Add(ref self.SpawnDyingParticles, Natives.CChicken_m_bCanRoam);
+            set => Unsafe.Add(ref self.SpawnDyingParticles, Natives.CChicken_m_bCanRoam) = value;
         }
 
         public void ApplyPetStyle(InventoryItem item)

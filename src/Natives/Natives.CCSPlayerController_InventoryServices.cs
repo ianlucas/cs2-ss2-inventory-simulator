@@ -7,6 +7,7 @@ namespace InventorySimulator;
 
 public static partial class Natives
 {
+    // Relative to m_nPersonaDataXpTrailLevel, so it follows layout changes on its own.
     public static readonly int CCSPlayerController_InventoryServices_m_pInventory = GetOffset(
         "CCSPlayerController_InventoryServices::m_pInventory"
     );

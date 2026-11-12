@@ -13,4 +13,7 @@ public static partial class Natives
 
     public static readonly IUnmanagedFunction<CChicken_InitPetDelegate> CChicken_InitPet =
         GetFunctionBySignature<CChicken_InitPetDelegate>("CChicken::InitPet");
+
+    // Relative to m_bSpawnDyingParticles, so it follows layout changes on its own.
+    public static readonly int CChicken_m_bCanRoam = GetOffset("CChicken::m_bCanRoam");
 }

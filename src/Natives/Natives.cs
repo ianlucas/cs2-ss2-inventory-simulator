@@ -14,12 +14,12 @@ public static partial class Natives
     )
         where TDelegate : Delegate
     {
-        nint? address = Runtime.Core.GameData.GetSignature(signatureName);
-        if (address is null)
+        var address = Runtime.Core.GameData.GetSignature(signatureName);
+        if (address == nint.Zero)
             throw new InvalidOperationException(
                 $"Failed to locate game function signature '{signatureName}'. The function may not exist in the current game version or the signature pattern may be outdated."
             );
-        return Runtime.Core.Memory.GetUnmanagedFunctionByAddress<TDelegate>(address.Value);
+        return Runtime.Core.Memory.GetUnmanagedFunctionByAddress<TDelegate>(address);
     }
 
     private static int GetOffset(string offsetName)

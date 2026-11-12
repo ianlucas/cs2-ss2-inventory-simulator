@@ -130,16 +130,13 @@ public static class IPlayerExtensions
                 if (self.IsUseCmdBusy())
                     controllerState.IsUseCmdBlocked = true;
                 controllerState.DisposeUseCmdTimer();
-                controllerState.UseCmdTimer = Runtime.Core.Scheduler.DelayBySeconds(
-                    0.1f,
-                    () =>
-                    {
-                        if (controllerState.IsUseCmdBlocked)
-                            controllerState.IsUseCmdBlocked = false;
-                        else if (self.IsValid && !self.IsUseCmdBusy())
-                            self.TrySprayGraffiti();
-                    }
-                );
+                controllerState.UseCmdTimer = Runtime.Core.Scheduler.DelayBySeconds(0.1f, () =>
+                {
+                    if (controllerState.IsUseCmdBlocked)
+                        controllerState.IsUseCmdBlocked = false;
+                    else if (self.IsValid && !self.IsUseCmdBusy())
+                        self.TrySprayGraffiti();
+                });
             }
         }
 
@@ -292,34 +289,31 @@ public static class IPlayerExtensions
                     actualDesignerName
                 );
                 if (weapon != null)
-                    Runtime.Core.Scheduler.Delay(
-                        32,
-                        () =>
+                    Runtime.Core.Scheduler.Delay(32, () =>
+                    {
+                        if (weapon.IsValid)
                         {
-                            if (weapon.IsValid)
+                            weapon.Clip1 = clip;
+                            weapon.Clip1Updated();
+                            weapon.ReserveAmmo[0] = reserve;
+                            weapon.ReserveAmmoUpdated();
+                            Runtime.Core.Scheduler.NextWorldUpdate(() =>
                             {
-                                weapon.Clip1 = clip;
-                                weapon.Clip1Updated();
-                                weapon.ReserveAmmo[0] = reserve;
-                                weapon.ReserveAmmoUpdated();
-                                Runtime.Core.Scheduler.NextWorldUpdate(() =>
+                                if (active && self.IsValid)
                                 {
-                                    if (active && self.IsValid)
+                                    var command = gearSlot switch
                                     {
-                                        var command = gearSlot switch
-                                        {
-                                            gear_slot_t.GEAR_SLOT_RIFLE => "slot1",
-                                            gear_slot_t.GEAR_SLOT_PISTOL => "slot2",
-                                            gear_slot_t.GEAR_SLOT_KNIFE => "slot3",
-                                            _ => null,
-                                        };
-                                        if (command != null)
-                                            self.ExecuteCommand(command);
-                                    }
-                                });
-                            }
+                                        gear_slot_t.GEAR_SLOT_RIFLE => "slot1",
+                                        gear_slot_t.GEAR_SLOT_PISTOL => "slot2",
+                                        gear_slot_t.GEAR_SLOT_KNIFE => "slot3",
+                                        _ => null,
+                                    };
+                                    if (command != null)
+                                        self.ExecuteCommand(command);
+                                }
+                            });
                         }
-                    );
+                    });
             }
         }
 
