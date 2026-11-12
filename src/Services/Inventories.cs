@@ -24,8 +24,7 @@ public static class Inventories
                 Path.Combine(Runtime.Core.GameDirectory, _inventoryFileDir, filename),
                 Path.Combine(Runtime.Core.GameDirectory, "csgo", filename),
             };
-            var path =
-                candidates.FirstOrDefault(File.Exists)
+            var path = candidates.FirstOrDefault(File.Exists)
                 ?? (Path.IsPathRooted(filename) && File.Exists(filename) ? filename : null);
             if (path == null)
                 return false;

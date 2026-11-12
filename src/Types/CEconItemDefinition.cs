@@ -17,24 +17,19 @@ public class CEconItemDefinition(nint address) : INativeHandle
 
     public void DangerouslySetAddress(nint address) => Address = address;
 
-    // 1. Search for the "Prohibiting %s\n" string, its only xref is the mp_items_prohibited
-    //    callback.
-    // 2. For each item in the ConVar, it compares the definition's index (a word at 0x10) and
-    //    prints its name (a pointer at 0x260) with "Prohibiting %s\n".
-    public ushort DefIndex => (ushort)Marshal.ReadInt16(Address + 0x10);
+    public ushort DefIndex =>
+        (ushort)Marshal.ReadInt16(Address + Natives.CEconItemDefinition_m_nDefIndex);
 
     public string? DefinitionName
     {
         get
         {
-            var ptr = Marshal.ReadIntPtr(Address + 0x260);
+            var ptr = Marshal.ReadIntPtr(Address + Natives.CEconItemDefinition_m_pszDefinitionName);
             return ptr != nint.Zero ? Marshal.PtrToStringUTF8(ptr) : null;
         }
     }
 
-    // 1. Search for the "Player.Respawn" string, its only xref is in the pawn's spawn function.
-    // 2. It calls SetModelFromLoadout and then SetModelFromClass, back to back, with only the pawn.
-    // 3. SetModelFromLoadout checks the agent's definition with cmp dword ptr [def + offset], 26h
-    //    (LOADOUT_SLOT_CLOTHING_CUSTOMPLAYER).
-    public loadout_slot_t DefaultLoadoutSlot => (loadout_slot_t)Marshal.ReadInt32(Address + 0x338);
+    public loadout_slot_t DefaultLoadoutSlot =>
+        (loadout_slot_t)
+            Marshal.ReadInt32(Address + Natives.CEconItemDefinition_m_iDefaultLoadoutSlot);
 }
